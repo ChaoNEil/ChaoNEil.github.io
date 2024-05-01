@@ -14,9 +14,10 @@
             <pubDate>Tue, 30 Apr 2024 13:14:06 +0530</pubDate>
             
             <guid>http://localhost:1313/posts/first-blog/</guid>
-            <description>This is all markdown file This is all markdown file This is all markdown fileThis is all markdown file</description>
-            <content type="html"><![CDATA[<p>This is all markdown file
-This is all markdown file This is all markdown fileThis is all markdown file</p>
+            <description>This will be the place where I put all of my blogs of stuff that I find interesting. It might not be interesting to you. It will be mostly blue team related content or anything that I find cool.
+I have some blogs already written. I will upload them here, stay tuned.</description>
+            <content type="html"><![CDATA[<p>This will be the place where I put all of my blogs of stuff that I find interesting. It might not be interesting to you. It will be mostly <strong>blue team</strong> related content or anything that I find cool.</p>
+<p>I have some blogs already written. I will upload them here, stay tuned.</p>
 ]]></content>
         </item>
         

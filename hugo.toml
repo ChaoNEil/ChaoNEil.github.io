@@ -35,7 +35,7 @@ paginate = 10
 
 
     [languages.en.params.logo]
-      logoText = "hello"
+      logoText = "hello friend.."
       logoHomeLink = "/"
     # or
     #
@@ -49,9 +49,9 @@ paginate = 10
     url        = "/posts"
 
   [[menu.main]]
-    identifier = "about"
-    name       = "About"
-    url        = "about/"
+    identifier = "whoami"
+    name       = "Whoami"
+    url        = "whoami/"
 
 
 # Addon: Social icons
