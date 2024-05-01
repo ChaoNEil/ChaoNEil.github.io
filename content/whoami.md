@@ -2,7 +2,7 @@
 title = "Whoami"
 +++
 
-Hi, I am **Chao Neil Aryan Borgohain** and I'm an just a n00b trying to be a **cyber security analyst**.
+Hi, I am **Chao Neil Aryan Borgohain** and I'm just a n00b trying to be a **cyber security analyst**.
 
 Currently I'm working on my Sec+ certificate and also doing home labs.
 
