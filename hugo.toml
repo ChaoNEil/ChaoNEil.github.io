@@ -1,6 +1,6 @@
 baseURL = 'https://chaoneil.github.io/'
 languageCode = 'en-us'
-title = "Starrider's site"
+title = "ChaoNEil"
 theme='hello-friend-ng'
 
 paginate = 10
@@ -47,3 +47,27 @@ paginate = 10
     identifier = "blog"
     name       = "Blog"
     url        = "/posts"
+
+  [[menu.main]]
+    identifier = "about"
+    name       = "About"
+    url        = "about/"
+
+
+# Addon: Social icons
+
+[[params.social]]
+    name = "linkedin"
+    url = "www.linkedin.com/in/chao-neil-aryan-borgohain-264724175"
+    
+[[params.social]]
+    name = "hackthebox"
+    url = "https://app.hackthebox.com/profile/1277083"
+
+[[params.social]]
+    name = "tryhackme"
+    url = "https://tryhackme.com/p/ChaoNEil"
+
+[[params.social]]
+    name = "twitter"
+    url  = "https://twitter.com/NBorgan"
