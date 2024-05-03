@@ -6,19 +6,19 @@
     <description>Recent content on ChaoNEil</description>
     <generator>Hugo</generator>
     <language>en</language>
-    <lastBuildDate>Wed, 01 May 2024 07:00:00 +0530</lastBuildDate>
+    <lastBuildDate>Thu, 01 Feb 2024 11:45:00 +0530</lastBuildDate>
     <atom:link href="http://localhost:1313/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>Malware Traffic Analysis (My thought Process)</title>
       <link>http://localhost:1313/posts/malware-traffic-analysis/</link>
-      <pubDate>Wed, 01 May 2024 07:00:00 +0530</pubDate>
+      <pubDate>Thu, 01 Feb 2024 11:45:00 +0530</pubDate>
       <guid>http://localhost:1313/posts/malware-traffic-analysis/</guid>
       <description>Hello blue teamers, this is my first traffic analysis writeup for my future reference and also to document my self-learning journey in Cyber Security, so I will keep this short and simple while going through how i approached this Wireshark network packet capture (pcap) file.&#xA;(Remember , through this write-up, i am talking to me, my future self. If any random people reads it, forgive me for any mistakes. Enjoy! )</description>
     </item>
     <item>
       <title>First Blog</title>
       <link>http://localhost:1313/posts/first-blog/</link>
-      <pubDate>Tue, 30 Apr 2024 13:14:06 +0530</pubDate>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
       <guid>http://localhost:1313/posts/first-blog/</guid>
       <description>This will be the place where I put all of my blogs of stuff that I find interesting. It might not be interesting to you. It will be mostly blue team related content or anything that I find cool.&#xA;I have some blogs already written. I will upload them here, stay tuned.</description>
     </item>
