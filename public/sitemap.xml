@@ -3,18 +3,17 @@
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
   <url>
     <loc>http://localhost:1313/</loc>
-    <lastmod>2024-05-01T07:00:00+05:30</lastmod>
+    <lastmod>2024-02-01T11:45:00+05:30</lastmod>
   </url><url>
     <loc>http://localhost:1313/posts/malware-traffic-analysis/</loc>
-    <lastmod>2024-05-01T07:00:00+05:30</lastmod>
+    <lastmod>2024-02-01T11:45:00+05:30</lastmod>
   </url><url>
     <loc>http://localhost:1313/posts/</loc>
-    <lastmod>2024-05-01T07:00:00+05:30</lastmod>
-  </url><url>
-    <loc>http://localhost:1313/posts/first-blog/</loc>
-    <lastmod>2024-04-30T13:14:06+05:30</lastmod>
+    <lastmod>2024-02-01T11:45:00+05:30</lastmod>
   </url><url>
     <loc>http://localhost:1313/blog/</loc>
+  </url><url>
+    <loc>http://localhost:1313/posts/first-blog/</loc>
   </url><url>
     <loc>http://localhost:1313/series/</loc>
   </url><url>

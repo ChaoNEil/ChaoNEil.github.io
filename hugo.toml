@@ -58,7 +58,7 @@ paginate = 10
 
 [[params.social]]
     name = "linkedin"
-    url = "www.linkedin.com/in/chao-neil-aryan-borgohain-264724175"
+    url = "https://www.linkedin.com/in/chao-neil-aryan-borgohain-264724175"
     
 [[params.social]]
     name = "hackthebox"
