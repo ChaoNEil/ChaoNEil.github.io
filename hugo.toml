@@ -71,3 +71,13 @@ paginate = 10
 [[params.social]]
     name = "twitter"
     url  = "https://twitter.com/NBorgan"
+
+
+
+[[module.mounts]]
+source = 'static'
+target = 'static'
+
+[[module.mounts]]
+source = 'images'
+target = 'static/images'
