@@ -4,7 +4,7 @@ title = "Whoami"
 
 Hi, I am **Chao Neil Aryan Borgohain** and I'm just a n00b trying to be a **cyber security analyst**.
 
-Currently I'm working on my Sec+ certificate and also doing home labs.
+Currently I have the Google Cybersecurity certificate and I'm working on my **Sec+** certificate, also, at the same time following the HackTheBox CDSA (SOC) job path. I have also set up home labs to practice attacks and defense and analyse malwares.
 
 Things that I am interested: 
 
