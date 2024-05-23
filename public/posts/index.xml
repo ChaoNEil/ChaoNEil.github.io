@@ -93,7 +93,7 @@ also,
 <code>The &quot;MZ&quot; signature is made up of the initials of Mark Zbikowski. He was one of the developers of the original MS-DOS executable file format. The letters &quot;MZ&quot; are also the hexadecimal characters 4D 5A, which are found in the first two bytes of the file.</code></p>
 <p>Now , we can do one thing, we can further analyze this PE file by exporting it to our VM/local machine. I advice exporting it to your VM since we don&rsquo;t the nature of the file.
 To export the file / artefact , click file, export objects as HTTP. Follow this:</p>
-<p><img alt="alt text" src="/images/Malware_traffic_analysis/Pasted_image_20240201145653.png"></p>
+<p><img src="/images/Malware_traffic_analysis/Pasted_image_20240201145653.png"></p>
 <p>Now you will be presented with an object list of what you want to export. Here, select the pdf file and save it as <code>ooiwy.pdf.malz</code>.
 I will put a .malz extension before saving it to my VM or host for extra safety measure.</p>
 <p><img src="/images/Malware_traffic_analysis/Pasted_image_20240201145942.png"></p>
