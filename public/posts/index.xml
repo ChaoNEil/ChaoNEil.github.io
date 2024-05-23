@@ -43,7 +43,7 @@ Before we began the actual analysis , I always like to go to the <code>Endpoints
 <p>As we can see below , there is a recurring IP in Address A. This is must be the host IP and we can also see the highest packet size that is happening between our host IP and an unknown IP <code>46.99.175.149</code>, hmm seems suspicious. Here our curiosity intuition should kick in and we must note it down. We can also apply that IP address as a filter which will allow us to look at the packets based on the protocol.
 To do that:
 - right click on the IP and :
-<img alt="alt text" src="/static/images/Malware_traffic_analysis/Pasted_image_20240201131353.png">
+<img src="/images/Malware_traffic_analysis/Pasted_image_20240201131353.png">
 This will show us the packets and at which protocol the transfer happened. However in this case, it was a miss. The protocol was TCP and not much information was there for me to move further so I left it there. A http would have been nice, but no matter.</p>
 <p>Based on this info , we can also note down the IOC (indicators of compromise) as that IP address.</p>
 <p><img src="/images/Malware_traffic_analysis/Pasted_image_20240201125757.png"></p>
