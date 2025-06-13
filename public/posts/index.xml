@@ -259,5 +259,57 @@ Once decoded, what is the command?</p>
 ]]></content>
         </item>
         
+        <item>
+            <title>HTB Pikaptcha</title>
+            <link>http://localhost:1313/posts/pipkapcha/</link>
+            <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+            
+            <guid>http://localhost:1313/posts/pipkapcha/</guid>
+            <description>Sherlocks - Easy Sherlock Scenario
+Happy Grunwald contacted the sysadmin, Alonzo, because of issues he had downloading the latest version of Microsoft Office. He had received an email saying he needed to update, and clicked the link to do it. He reported that he visited the website and solved a captcha, but no office download page came back. Alonzo, who himself was bombarded with phishing attacks last year and was now aware of attacker tactics, immediately notified the security team to isolate the machine as he suspected an attack.</description>
+            <content type="html"><![CDATA[<h2 id="sherlocks---easy">Sherlocks - Easy</h2>
+<p><strong>Sherlock Scenario</strong></p>
+<p>Happy Grunwald contacted the sysadmin, Alonzo, because of issues he had downloading the latest version of Microsoft Office. He had received an email saying he needed to update, and clicked the link to do it. He reported that he visited the website and solved a captcha, but no office download page came back. Alonzo, who himself was bombarded with phishing attacks last year and was now aware of attacker tactics, immediately notified the security team to isolate the machine as he suspected an attack. You are provided with network traffic and endpoint artifacts to answer questions about what happened.</p>
+<hr>
+<p>Q1.
+It is crucial to understand any payloads executed on the system for initial access. Analyzing registry hive for user happy grunwald. What is the full command that was run to download and execute the stager?</p>
+<p>Analyzing user &ldquo;happy grunwald&rdquo;&rsquo;s hive with registry explorer; also follow the steps to load the transaction replay logs (.log1 and .log2) to load recent changes.</p>
+<p>Go to the &ldquo;bookmarks&rdquo; tab to automatically view the important data.</p>
+<p>Looking at RunMRU key because It&rsquo;s one of the best spots to find user-typed commands, we can see the full command that was run to download and execute the stager.</p>
+<p>RunMRU (run most recently used) stores commands typed by the user into the Start run box (win+r).</p>
+<hr>
+<p>Q2.
+At what time in UTC did the malicious payload execute?</p>
+<p>We can see the time right there.</p>
+<p>We now have a timeline to follow.</p>
+<hr>
+<p>Q3.
+The payload which was executed initially downloaded a PowerShell script and executed it in memory. What is sha256 hash of the script?</p>
+<p>To answer this question , we will head back to the pcap file and filter for the ip we found before . We can see the file <code>office2024install.ps1</code> , export the file from the pcap and hash it up.</p>
+<hr>
+<p>Q4.
+To which port did the reverse shell connect?</p>
+<p>Analyze the powershell script that we just exported. Spits out base64 encoded text.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>strings office2024install.ps1
+</span></span><span style="display:flex;"><span>&lt;base64string&gt;
+</span></span></code></pre></div><p>Decode with cyberchef and remove null bytes to make it readable.
+Here we can see the port of the reverse shell.</p>
+<hr>
+<p>Q5.
+For how many seconds was the reverse shell connection established between C2 and the victim&rsquo;s workstation?</p>
+<p>We will go back to the pcap file again filter for that ip but now with new found port <code>6969</code> .
+<code>ip.addr == 43.205.115.44 &amp;&amp; tcp.port == 6969</code></p>
+<p>Take the first packet&rsquo;s UTC time and last packet&rsquo;s UTC time and put it in a time duration calculator on google, and we will find the answer (in secs).</p>
+<hr>
+<p>Q6.
+Attacker hosted a malicious Captcha to lure in users. What is the name of the function which contains the malicious payload to be pasted in victim&rsquo;s clipboard?</p>
+<p>Use this filter
+<code>ip.addr == 43.205.115.44 &amp;&amp; http</code>
+and click on the last packet and select &rsquo;line based text data&rsquo; under packet data to see the source code and find the malicious function.</p>
+<p>We can corelated this run command to the first question we answered, the <code>RunMRU key</code>.</p>
+<p>The victim pasted this command into run and the <code>.ps1</code> file  executed a reverse shell that allowed the threat actor to further enumerate.</p>
+]]></content>
+        </item>
+        
     </channel>
 </rss>
