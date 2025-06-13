@@ -167,5 +167,97 @@ I have some blogs already written. I will upload them here, stay tuned.</descrip
 ]]></content>
         </item>
         
+        <item>
+            <title>HTB NeuroSync-D</title>
+            <link>http://localhost:1313/posts/htb-sherlock-neurosync/</link>
+            <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+            
+            <guid>http://localhost:1313/posts/htb-sherlock-neurosync/</guid>
+            <description>Sherlocks - Easy Sherlock Scenario
+NeuroSync™ is a leading suite of products focusing on developing cutting edge medical BCI devices, designed by the Korosaki Coorporaton. Recently, an APT group targeted them and was able to infiltrate their infrastructure and is now moving laterally to compromise more systems. It appears that they have even managed to hijack a large number of online devices by exploiting an N-day vulnerability. Your task is to find out how they were able to compromise the infrastructure and understand how to secure it.</description>
+            <content type="html"><![CDATA[<h2 id="sherlocks---easy">Sherlocks - Easy</h2>
+<p><strong>Sherlock Scenario</strong></p>
+<p>NeuroSync™ is a leading suite of products focusing on developing cutting edge medical BCI devices, designed by the Korosaki Coorporaton. Recently, an APT group targeted them and was able to infiltrate their infrastructure and is now moving laterally to compromise more systems. It appears that they have even managed to hijack a large number of online devices by exploiting an N-day vulnerability. Your task is to find out how they were able to compromise the infrastructure and understand how to secure it.</p>
+<p>We are given these as <em>artefacts</em>:</p>
+<p>access.log: Logs incoming HTTP requests to a web server, including details like IP addresses, request paths, timestamps, and response codes.</p>
+<p>bci-device.log: Likely logs related to a Brain-Computer Interface (BCI) device, including device status, errors, or data transfers.</p>
+<p>data-api.log: Likely logs related to interactions with a data API, including request/response details, errors, and performance metrics.</p>
+<p>interface.log: Likely logs interactions with user interfaces, possibly capturing user input, events, or errors within a GUI or web interface.</p>
+<p>redis.log: Logs from a Redis database, capturing system events, commands, errors, and other activities within the Redis instance.</p>
+<hr>
+<p>Q1.
+What version of Next.js is the application using?</p>
+<p>We can find this in the <code>interface.log</code></p>
+<hr>
+<p>Q2.
+What local port is the Next.js-based application running on?</p>
+<p>We can find this in the <code>interface.log</code></p>
+<hr>
+<p>Q3.
+A critical Next.js vulnerability was released in March 2025, and this version appears to be affected. What is the CVE identifier for this vulnerability?</p>
+<p>Google is your friend
+CVE-2025-29927</p>
+<hr>
+<p>Q4.
+The attacker tried to enumerate some static files that are typically available in the Next.js framework, most likely to retrieve its version. What is the first file he could get?</p>
+<p>Enumerating some static files likely means he accessed the site , so we look at <code>access.log</code> to look for web requests and look for the first  <code>HTTP GET 200</code>.</p>
+<hr>
+<p>Q5.
+Then the attacker appears to have found an endpoint that is potentially affected by the previously identified vulnerability. What is that endpoint?</p>
+<p>Analyzing the access.log , we can see a whole lot of requests to the <code>/api/bci/analytics</code> endpoint and again in the <code>interface.log</code> we can see the same endpoint being accessed.</p>
+<hr>
+<p>Q6.
+How many requests to this endpoint have resulted in an &ldquo;Unauthorized&rdquo; response?</p>
+<p>In the access.log , we can only see 5 <code>401</code> unauthorized response code.</p>
+<hr>
+<p>Q7.
+When is a successful response received from the vulnerable endpoint, meaning that the middleware has been bypassed?</p>
+<p>After 401s  , we can see a 200 response . 2025-04-01 11:38:05</p>
+<hr>
+<p>Q8.
+Given the previous failed requests, what will most likely be the final value for the vulnerable header used to exploit the vulnerability and bypass the middleware?</p>
+<p>So in simple terms , in this exploit , it lets an attacker <strong>bypass authentication</strong> by sending a special header in their request in a Next.js app.</p>
+<p>If a Next.js app protects a page using <strong>middleware</strong> (like checking if a user is logged in), an attacker can skip that middleware by adding this HTTP header:</p>
+<pre tabindex="0"><code class="language-header" data-lang="header">x-middleware-subrequest: middleware
+</code></pre><p>The attacker can increase the header using this pattern until it bypasses the auth check.</p>
+<pre tabindex="0"><code>&#34;x-middleware-subrequest&#34;:&#34;middleware&#34;
+&#34;x-middleware-subrequest&#34;:&#34;middleware:middleware&#34;
+&#34;x-middleware-subrequest&#34;:&#34;middleware:middleware:middleware&#34;
+</code></pre><p>There are 4 failed (401 code) <code>middleware</code> strings present in the <code>interface.log</code> and after that we can see a 200 response code indicating a success.
+So the repetition of the middleware string should go up-to 5 .</p>
+<p><code>middleware-subrequest: middleware:middleware:middleware:middleware:middleware</code>
+This is the answer.</p>
+<hr>
+<p>Q9.
+The attacker chained the vulnerability with an SSRF attack, which allowed them to perform an internal port scan and discover an internal API. On which port is the API accessible?</p>
+<p>Look at <code>data-api.log</code> , match the timestamp of the attack, and we can see the port number 4000.</p>
+<hr>
+<p>Q10.
+After the port scan, the attacker starts a brute-force attack to find some vulnerable endpoints in the previously identified API. Which vulnerable endpoint was found?</p>
+<p>In the same log file as above , we can see the endpoint <code>/logs</code> is vulnerable followed by a <code>/etc/passwd</code> command on that endpoint.</p>
+<hr>
+<p>Q11.
+When the vulnerable endpoint found was used maliciously for the first time?</p>
+<p>On 2025-04-01 11:39:01 , the attacker accessed the <code>/etc/passwd</code> file from that endpoint for the first time.</p>
+<hr>
+<p>Q12.
+What is the attack name the endpoint is vulnerable to?</p>
+<p>We can see a bypass technique with unusual path traversal to read the <code>passwd</code> file.
+This is a classic example of <code>Local file inclusion (LFI)</code>.</p>
+<hr>
+<p>Q13.
+What is the name of the file that was targeted the last time the vulnerable endpoint was exploited?</p>
+<p>Start from the bottom of data.api.log file , we can see <code>secret.key</code> file being accessed.</p>
+<hr>
+<p>Q14.
+Finally, the attacker uses the sensitive information obtained earlier to create a special command that allows them to perform Redis injection and gain RCE on the system. What is the command string?</p>
+<p>This question suggests we look in the <code>redis.log</code> file and we sure do see a base64 OS command there.</p>
+<hr>
+<p>Q15.
+Once decoded, what is the command?</p>
+<p>Decode the command on cyberchef.</p>
+]]></content>
+        </item>
+        
     </channel>
 </rss>
