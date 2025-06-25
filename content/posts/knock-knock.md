@@ -96,7 +96,7 @@ use the `ftp-data` filter and follow tcp stream on those 2 files to read without
 
 To answer this question , i found the config data and creds from the `.backup` file .
 
-At first glance , i thought i knew what is going on, but after carefully analyzing this, honestly have no idea. I only recognize the command `iptables` so this might be doing something related to getting access to a particular port ? idk .
+At first glance , i thought i knew what was going on, but after carefully analyzing this, honestly have no idea. I only recognize the command `iptables` so this might be doing something related to getting access to a particular port ? idk .
 
 Further analysis of this will be done in question 8.
 ![](/images/knockknock/6.png)

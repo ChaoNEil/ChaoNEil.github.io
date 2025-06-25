@@ -234,7 +234,7 @@ What is name of the file which contained some config data and credentials?</p>
 use the <code>ftp-data</code> filter and follow tcp stream on those 2 files to read without exporting.</p>
 <p><code>ip.addr==3.109.209.43 &amp;&amp; ftp || ftp-data</code></p>
 <p>To answer this question , i found the config data and creds from the <code>.backup</code> file .</p>
-<p>At first glance , i thought i knew what is going on, but after carefully analyzing this, honestly have no idea. I only recognize the command <code>iptables</code> so this might be doing something related to getting access to a particular port ? idk .</p>
+<p>At first glance , i thought i knew what was going on, but after carefully analyzing this, honestly have no idea. I only recognize the command <code>iptables</code> so this might be doing something related to getting access to a particular port ? idk .</p>
 <p>Further analysis of this will be done in question 8.
 <img src="/images/knockknock/6.png"></p>
 <p>The attacker also got creds to a mysql database server from the <code>.fetch</code> file, see below ss:
