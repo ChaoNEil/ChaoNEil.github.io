@@ -168,6 +168,136 @@ I have some blogs already written. I will upload them here, stay tuned.</descrip
         </item>
         
         <item>
+            <title>HTB Heartbreaker</title>
+            <link>http://localhost:1313/posts/heartbreaker/</link>
+            <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+            
+            <guid>http://localhost:1313/posts/heartbreaker/</guid>
+            <description>Sherlocks - Medium Sherlock Scenario
+Delicate situation alert! The customer has just been alerted about concerning reports indicating a potential breach of their database, with information allegedly being circulated on the darknet market. As the Incident Responder, it&amp;rsquo;s your responsibility to get to the bottom of it. Your task is to conduct an investigation into an email received by one of their employees, comprehending the implications, and uncovering any possible connections to the data breach.</description>
+            <content type="html"><![CDATA[<h2 id="sherlocks---medium">Sherlocks - Medium</h2>
+<p><strong>Sherlock Scenario</strong></p>
+<p>Delicate situation alert! The customer has just been alerted about concerning reports indicating a potential breach of their database, with information allegedly being circulated on the darknet market. As the Incident Responder, it&rsquo;s your responsibility to get to the bottom of it. Your task is to conduct an investigation into an email received by one of their employees, comprehending the implications, and uncovering any possible connections to the data breach. Focus on examining the artifacts provided by the customer to identify significant events that have occurred on the victim&rsquo;s workstation.</p>
+<p><strong>Artifacts</strong>:</p>
+<p>We have been given artifacts collected using automated triage tools such as KAPE.</p>
+<hr>
+<p>Q1
+The victim received an email from an unidentified sender. What email address was used for the suspicious email?</p>
+<p>In this directory , there is a email for the user ash
+<code>wb-ws-01/C/Users/ash.williams/AppData/Local/Microsoft/Outlook/ash@gmail.com.ost</code></p>
+<p>This is a Microsoft Outlook OST file , and to load the file , we must setup an outlook account and its a hassle to do all that just for this challenge. Hence to solve this issue i have looked upon the internet and found a tool just for this purpose.</p>
+<p><code>https://github.com/avranju/pff-tools</code></p>
+<p>To use :</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>pffexport path/to/the/ost/file
+</span></span></code></pre></div><p>After exporting , it will create a directory with a <code>.export</code> extension. We can browse it normally with our file explorer.</p>
+<p>Under <code>Inbox</code> , among all the other emails , <code>Message00004</code> seems the most suspicious</p>
+<pre tabindex="0"><code>ashwilliams012100@gmail.com.ost.export/Root - Mailbox/IPM_SUBTREE/Inbox/Message00004
+</code></pre><p>There is also an attachment available which is a <code>.tiff</code> file, &ldquo;a Tagged Image File Format&rdquo;.
+<img src="/images/heartbreaker/1.png">
+We can also download the &ldquo;privateMembership.tiff&rdquo; file which is a <code>.exe</code> file.</p>
+<p>All this fits the scenario that we have been told.</p>
+<p>Coming back to the question, we can find the sender&rsquo;s email in the <code>OutlookHeaders.txt</code> file.</p>
+<p><code>ImSecretlyYours@proton.me</code></p>
+<hr>
+<p>Q2
+It appears there&rsquo;s a link within the email. Can you provide the complete URL where the malicious binary file was hosted?</p>
+<p>Copy the URL from the <code>message.html</code> file inside the <code>Message00004</code> directory.</p>
+<p><code>hxxp[://]44[.]206[.]187[.]144:9000/Superstar_MemberCard[.]tiff[.]exe</code></p>
+<p>This is the defanged url.</p>
+<hr>
+<p>Q3
+The threat actor managed to identify the victim&rsquo;s AWS credentials. From which file type did the threat actor extract these credentials?</p>
+<p><code>.ost</code> is the file format we are analyzing and extracting information from.</p>
+<hr>
+<p>Q4
+Provide the actual IAM credentials of the victim found within the artifacts.</p>
+<p>This can be found in the <code>[Gmail]</code> directory under <code>IPM_SUBTREE/</code>.</p>
+<pre tabindex="0"><code>[Gmail]/Drafts/Message00001/Message.html
+</code></pre><p><img src="/images/heartbreaker/4.png"></p>
+<hr>
+<p>Q5
+When (UTC) was the malicious binary activated on the victim&rsquo;s workstation?</p>
+<p>For this we will look at the various windows event logs, both default event logs and SYSMON event logs.
+Usually they are stored here <code>%SYSTEMROOT%\System32\Winevt\Logs%</code></p>
+<p>We can use a tool from EricZimmerman forensics to make the analysis faster.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-powershell" data-lang="powershell"><span style="display:flex;"><span>.\EvtxECmd.exe -d path/to/even/logs --csv /path/to/save
+</span></span></code></pre></div><p>This tool will parse all the logs into a format compatible with forensic analysis tools like <strong>Timeline Explorer</strong>, which we will use next.</p>
+<p>*Timeline Explorer:
+Filter for <code>.tiff</code> in <code>Executable Info</code> and look for a <code>process creation</code>.</p>
+<p><img src="/images/heartbreaker/5.png"></p>
+<p>Going further right will show us that a process for <code>SuperStar_MemberCard.tiff.exe</code> has started :
+<img src="/images/heartbreaker/5a.png"></p>
+<p><img src="/images/heartbreaker/5b.png">
+Above, going further left will give us the time.</p>
+<p><code>2024-03-13 10:45:02</code></p>
+<hr>
+<p>Q6
+Following the download and execution of the binary file, the victim attempted to search for specific keywords on the internet. What were those keywords?</p>
+<p>Here lies the firefox profile data &mdash;&gt; <code>wb-ws-01\C\Users\ash.williams\AppData\Roaming\Mozilla\Firefox\Profiles\hy42b1gc.default-release</code></p>
+<p>Files under this directory will be in <code>.sqlite</code> which can be opened using <code>DB browser</code>.</p>
+<p>Coming back to the question, the victim searched this after downloading the malicious binary.<br>
+<img src="/images/heartbreaker/6.png"></p>
+<p>We can also take the epoch time and convert it into UTC to further confirm this as the
+answer.</p>
+<p><img src="/images/heartbreaker/6a.png"></p>
+<hr>
+<p>Q7
+At what time (UTC) did the binary successfully send an identical malicious email from the victim&rsquo;s machine to all the contacts?</p>
+<p>For this we will again go back to the <code>.ost</code> email file.
+This information can be found here &mdash;&gt;</p>
+<p><code>ashwilliams012100@gmail.com.ost.export/Root - Mailbox/IPM_SUBTREE/[Gmail]/Sent Mail/Message00005/OutlookHeaders.txt</code></p>
+<p><img src="/images/heartbreaker/7.png"></p>
+<p>If we look at the <code>Recipients.txt</code> file , we can see that this email has been forwarded to all <code>ash.williams's</code> contact.</p>
+<hr>
+<p>Q8
+How many recipients were targeted by the distribution of the said email excluding the victim&rsquo;s email account?</p>
+<p>From the <code>Recipients.txt</code> file,  we can count the number.</p>
+<p><img src="/images/heartbreaker/8.png"></p>
+<hr>
+<p>Q9
+Which legitimate program was utilized to obtain details regarding the domain controller?</p>
+<p>Go through <code>TimeLine Explorer</code> and clear previous filters. Now search for
+&ldquo;<code>Superstar_MemberCard.tiff.exe</code>&rdquo; , sort the time and look at <code>&quot;payload data6</code></p>
+<p><img src="/images/heartbreaker/9.png"></p>
+<p><code>nltest.exe</code></p>
+<hr>
+<p>Q10
+Specify the domain (including sub-domain if applicable) that was used to download the tool for exfiltration.</p>
+<p>Timeline Explorer&mdash;&gt;
+We can see <code>Winscp</code> which is a file transfer tool, probably used to exfiltrate data.</p>
+<p><img src="/images/heartbreaker/10.png"></p>
+<p><code>us[.]softrader[.]com</code></p>
+<hr>
+<p>Q11
+The threat actor attempted to conceal the tool to elude suspicion. Can you specify the name of the folder used to store and hide the file transfer program?</p>
+<p>From the previous image ;
+Answer is <code>HelpDesk-Tools</code></p>
+<hr>
+<p>Q12
+Under which MITRE ATT&amp;CK technique does the action described in question #11 fall?</p>
+<p>This attempt to conceal the tool(helpdesk-tools) to elude suspicion is called
+<code>Masquerading</code></p>
+<hr>
+<p>Q13
+Can you determine the minimum number of files that were compressed before they were extracted?</p>
+<p><img src="/images/heartbreaker/13.png"></p>
+<p>The attacker compressed all files above and either compressed it into <code>WinSCP.zip</code> or <code>WB-WS-01.zip</code> then exfiltrated using <code>winscp</code> tool.</p>
+<p>26 is the ans.</p>
+<hr>
+<p>Q14
+To exfiltrate data from the victim&rsquo;s workstation, the binary executed a command. Can you provide the complete command used for this action?</p>
+<p>With this search :</p>
+<p><img src="/images/heartbreaker/14.png"></p>
+<p>and with the info from the previous question,
+we can see the binary execute a command with the script <code>maintenanceScript.txt </code> after the compression of the data.</p>
+<p>The Executable Info column provides the full command used by the malware.
+<img src="/images/heartbreaker/14a.png"></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-powershell" data-lang="powershell"><span style="display:flex;"><span><span style="color:#e6db74">&#34;C:\Users\Public\HelpDesk-Tools\WinSCP.com&#34;</span> /script=<span style="color:#e6db74">&#34;C:\Users\Public\HelpDesk-Tools\maintenanceScript.txt&#34;</span> 
+</span></span></code></pre></div><hr>
+]]></content>
+        </item>
+        
+        <item>
             <title>HTB Knock-Knock</title>
             <link>http://localhost:1313/posts/knock-knock/</link>
             <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>

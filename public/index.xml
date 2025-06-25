@@ -23,6 +23,13 @@
       <description>This will be the place where I put all of my blogs of stuff that I find interesting. It might not be interesting to you. It will be mostly blue team related content or anything that I find cool.&#xA;I have some blogs already written. I will upload them here, stay tuned.</description>
     </item>
     <item>
+      <title>HTB Heartbreaker</title>
+      <link>http://localhost:1313/posts/heartbreaker/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      <guid>http://localhost:1313/posts/heartbreaker/</guid>
+      <description>Sherlocks - Medium Sherlock Scenario&#xA;Delicate situation alert! The customer has just been alerted about concerning reports indicating a potential breach of their database, with information allegedly being circulated on the darknet market. As the Incident Responder, it&amp;rsquo;s your responsibility to get to the bottom of it. Your task is to conduct an investigation into an email received by one of their employees, comprehending the implications, and uncovering any possible connections to the data breach.</description>
+    </item>
+    <item>
       <title>HTB Knock-Knock</title>
       <link>http://localhost:1313/posts/knock-knock/</link>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
