@@ -17,6 +17,8 @@
   </url><url>
     <loc>http://localhost:1313/posts/htb-sherlock-neurosync/</loc>
   </url><url>
+    <loc>http://localhost:1313/posts/pipkapcha/</loc>
+  </url><url>
     <loc>http://localhost:1313/series/</loc>
   </url><url>
     <loc>http://localhost:1313/tags/</loc>

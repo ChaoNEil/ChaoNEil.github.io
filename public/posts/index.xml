@@ -168,6 +168,191 @@ I have some blogs already written. I will upload them here, stay tuned.</descrip
         </item>
         
         <item>
+            <title>HTB Knock-Knock</title>
+            <link>http://localhost:1313/posts/knock-knock/</link>
+            <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+            
+            <guid>http://localhost:1313/posts/knock-knock/</guid>
+            <description>Sherlocks - Medium Sherlock Scenario A critical Forela Dev server was targeted by a threat group. The Dev server was accidentally left open to the internet which it was not supposed to be. The senior dev Abdullah told the IT team that the server was fully hardened and it&amp;rsquo;s still difficult to comprehend how the attack took place and how the attacker got access in the first place. Forela recently started its business expansion in Pakistan and Abdullah was the one IN charge of all infrastructure deployment and management.</description>
+            <content type="html"><![CDATA[<h2 id="sherlocks---medium">Sherlocks - Medium</h2>
+<h5 id="sherlock-scenario">Sherlock Scenario</h5>
+<p>A critical Forela Dev server was targeted by a threat group. The Dev server was accidentally left open to the internet which it was not supposed to be. The senior dev Abdullah told the IT team that the server was fully hardened and it&rsquo;s still difficult to comprehend how the attack took place and how the attacker got access in the first place. Forela recently started its business expansion in Pakistan and Abdullah was the one IN charge of all infrastructure deployment and management. The Security Team need to contain and remediate the threat as soon as possible as any more damage can be devastating for the company, especially at the crucial stage of expanding in other region. Thankfully a packet capture tool was running in the subnet which was set up a few months ago. A packet capture is provided to you around the time of the incident (1-2) days margin because we don&rsquo;t know exactly when the attacker gained access. As our forensics analyst, you have been provided the packet capture to assess how the attacker gained access. Warning : This Sherlock will require an element of OSINT to complete fully.</p>
+<h5 id="artefacts">Artefacts</h5>
+<p>A wireshark capture file (.pcap) .</p>
+<hr>
+<p>Q1.
+Which ports did the attacker find open during their enumeration phase?</p>
+<p>I know for a fact that nmap sends <code>TCP SYN</code> packets to target server to scope out possible open ports.
+I went into wireshark&rsquo;s <code>statistics ---&gt; Endpoints</code> and sorted by most packets. Found a weird looking (3.109.209.43) recurring IP address sending tons of syn packets to a static destination address (172.31.39.46)
+Possible sus ip : 3.109.209.43
+<img src="/static/images/knockknock/1.png"></p>
+<p>To further clear out the noise i tweaked the filter a bit:
+<code>ip.addr==3.109.209.43</code>
+This confirmed even further that this IP is the attacker-owned IP.
+The <code>172.31.39.46</code> might be the dev server.</p>
+<p>Now to know how many open ports the attacker found , we must look for <code>SYN/ACK</code> packets . <code>Syn/ack</code> packets indicate that the server responded and there is a service on the target server.</p>
+<p>This is the final filter I used  :
+<code>ip.addr==3.109.209.43 &amp;&amp; tcp.flags.syn == 1 &amp;&amp; tcp.flags.ack == 1</code>
+(here 1 indicates a Yes , 0 is null/no).</p>
+<p>Apply this filter, the first 5 packets will include the answer ports.</p>
+<p>Answer: <code>21,22,3306,6379,8086</code></p>
+<p>I advice you all to watch this video,
+How NMAP Works and How to Detect Port Scans in Wireshark (A good refresher):
+<a href="https://www.youtube.com/watch?v=Maec4f2gt2c">https://www.youtube.com/watch?v=Maec4f2gt2c</a></p>
+<hr>
+<p>Q2.
+Whats the UTC time when attacker started their attack against the server?</p>
+<p>Remove the previous final filter and apply initial filter
+<code>ip.addr==3.109.209.43</code></p>
+<p>This will show us the nmap scan.</p>
+<p><img src="/static/images/knockknock/2.png"></p>
+<hr>
+<p>Q3.
+What&rsquo;s the MITRE Technique ID of the technique attacker used to get initial access?</p>
+<p>Using the filter above , scroll down near the end. You will see some TCP packets sent to port 21 and eventually you will see FTP packets . Going down further , you will see user <code>alonzo.spire</code> trying to gain access to his account followed by a brute force password spraying attack by the attacker.</p>
+<p><img src="/static/images/knockknock/3.png"></p>
+<p>After port scanning, the attacker found several open ports and has decided to attack FTP port 21 instead. He opted for password spraying (a form of brute force attack) in hopes of getting a hit for the user <code>alzono.spire</code> or <code>tony.shephard</code> or <code>lin.bayley</code>.</p>
+<p>The MITRE technique ID of this attack is <code>T1110.003</code>.</p>
+<hr>
+<p>Q4.
+What are valid set of credentials used to get initial foothold?</p>
+<p>Keep scrolling down looking through the requests , you will finally see a <code>230 login successful</code> ftp packet. Then look for the last username and password that led to this login successful event, you will get your cred.</p>
+<p>This is the cred that worked  <code>tony.shephard:Summer2023!</code></p>
+<p>There might be a better and more efficient way of doing this but i did it this way.</p>
+<hr>
+<p>Q5.
+What is the Malicious IP address utilized by the attacker for initial access?</p>
+<p>From the investigation that i did up until this point, the ip <code>3.109.209.43</code> is definitely malicious.</p>
+<p>Answer : <code>3.109.209.43</code></p>
+<hr>
+<p>Q6.
+What is name of the file which contained some config data and credentials?</p>
+<p>Using this filter <code>ip.addr==3.109.209.43 &amp;&amp; ftp</code>, we can see the attacker access <code>.backup</code> (a hidden file), <code>fetch.sh</code> and enumerating the file server.</p>
+<p>To see what is inside those two files , we can either :
+<code>export objects ---&gt; ftp-data</code> then save those files to our VM or
+use the <code>ftp-data</code> filter and follow tcp stream on those 2 files to read without exporting.</p>
+<p><code>ip.addr==3.109.209.43 &amp;&amp; ftp || ftp-data</code></p>
+<p>To answer this question , i found the config data and creds from the <code>.backup</code> file .</p>
+<p>At first glance , i thought i knew what is going on, but after carefully analyzing this, honestly have no idea. I only recognize the command <code>iptables</code> so this might be doing something related to getting access to a particular port ? idk .</p>
+<p>Further analysis of this will be done in question 8.
+<img src="/static/images/knockknock/6.png"></p>
+<p>The attacker also got creds to a mysql database server from the <code>.fetch</code> file, see below ss:
+<img src="/static/images/knockknock/6a.png"></p>
+<hr>
+<p>Q7.
+Which port was the critical service running?</p>
+<p>See the port above, <code>22456</code>. However that critical service is hidden until we do the pre-requisites. Analysis on the next question.</p>
+<hr>
+<p>Q8.
+Whats the name of technique used to get to that critical service?</p>
+<p>I had no clue what this technique was before i googled it and learnt about it, pretty interesting concept too.
+Basically <code>port knocking</code> is like a sequence of requests to open a door.</p>
+<p>By looking at the .backup file , the sequence of requests someone has to make is to ports is <code>29999 → 50234 → 45087</code> in the right order and timing (withing 5 secs). The service then recognizes this as a &ldquo;knock&rdquo; from a trusted client. It then runs an iptables command to allow that IP access to port <code>24456</code>.</p>
+<p>Pretty cool huh! It was cool but it seems this was very easily bypassed. Now this technique is seen less solely but can be seen along with other layers of security.</p>
+<p>Answer : <code>port knocking</code></p>
+<hr>
+<p>Q9.
+Which ports were required to interact with to reach the critical service?</p>
+<p><code>29999 → 50234 → 45087</code></p>
+<hr>
+<p>Q10.
+Whats the UTC time when interaction with previous question ports ended?</p>
+<p>The time when the port knocking sequence has ended. I simply added the port numbers as filters.</p>
+<p><code>ip.addr==3.109.209.43 &amp;&amp; tcp.port == 29999 || tcp.port == 50234 || tcp.port == 45087</code></p>
+<p>Grab the last packet&rsquo;s timestamp from the filter output.</p>
+<hr>
+<p>Q11.
+What are set of valid credentials for the critical service?</p>
+<p>We can see the creds in the <code>.backup</code> file . See the screenshot from question 6.</p>
+<hr>
+<p>Q12.
+At what UTC Time attacker got access to the critical server?</p>
+<p>I used this filter <code>ip.addr==3.109.209.43 &amp;&amp; tcp.port==24456</code></p>
+<p>I was glancing through each packets looking at the hex dump pane and found out that the packet number <code>210797</code> includes the password that i saw in the <code>.backup</code> file.</p>
+<p><img src="/static/images/knockknock/12.png"></p>
+<p>Also after following <code>TCP stream</code> on this packet, we can see the complete conversation gaining further insights. The hex dump pane also showed that this is an internal FTP server.
+<img src="/static/images/knockknock/12a.png"></p>
+<p>Answer <code>21/03/2023 11:00:01</code></p>
+<hr>
+<p>Q13.
+Whats the AWS AccountID and Password for the developer &ldquo;Abdullah&rdquo;?</p>
+<p>To get this answer , i had to look at the packets again. Why did wireshark , if this was confirmed ftp packets , not showing me in ftp-packets-format like before ?  That format was easier to read and analyze, instead the ftp data is thrown at me like normal TCP packets.
+I had to consult my old friend Google and it turns out Wireshark is doing this because the port is a non-standard FTP port. Wireshark can only analyze ftp-data nicely when it is coming from a standard ftp port.</p>
+<p>To fix this , i decoded the packets to ftp . Right click on a non-clear ftp packet and <code>decode as ftp</code> .</p>
+<p><img src="/static/images/knockknock/13.png"></p>
+<p>The display is now clear, and the FTP data appears properly formatted, just as it should be.</p>
+<p>I <code>followed TCP stream</code> and there are some files the attacker downloaded as well as the entire conversation.</p>
+<p><img src="/static/images/knockknock/13a.png"></p>
+<p>Now to view them for myself, I <code>exported objects</code> from now reprocessed ftp data.</p>
+<p><img src="/static/images/knockknock/13b.png"></p>
+<p>I found the AWS AccountID and Password for the developer &ldquo;Abdullah&rdquo; inside <code>.archived.sql</code> mysql dump.</p>
+<p>Answer : <code>391629733297','yiobkod0986Y[adij@IKBDS</code></p>
+<hr>
+<p>Q14.
+Whats the deadline for hiring developers for forela?</p>
+<p>I found this inside <code>Tasks_to_get_Done.docx</code>
+Answer: <code>30/08/2023</code></p>
+<hr>
+<p>Q15.
+When did CEO of forela was scheduled to arrive in pakistan?</p>
+<p>Open <code>reminder.txt</code>
+Answer: <code>08/03/2023</code></p>
+<hr>
+<p>Q16.
+The attacker was able to perform directory traversel and escape the chroot jail.This caused attacker to roam around the filesystem just like a normal user would. Whats the username of an account other than root having /bin/bash set as default shell?</p>
+<p>Followed the TCP stream and read the conversation to find the answer. The attacker traversed the directory , accessed the <code>/etc/passwd</code> file and did basic host enumeration commands like whoami etc.</p>
+<p>Answer: <code>cyberjunkie</code></p>
+<hr>
+<p>Q17.
+Whats the full path of the file which lead to ssh access of the server by attacker?</p>
+<p>The attacker also downloaded a <code>.reminder</code> file , I opened that file and saw a note telling me to clean a github repo to avoid leaking sensitive stuff.
+I think this is how the attacker got access to ssh which is evident from the future questions.</p>
+<p>The path where the attacker found this .reminder file is
+<code>/opt/reminders/.reminder</code>.</p>
+<p>I found this while i was reading through the TCP stream conversation.</p>
+<p>Answer: <code>/opt/reminders/.reminder</code>. `</p>
+<hr>
+<p>Q18.
+Whats the SSH password which attacker used to access the server and get full access?</p>
+<p>Was very lost on this one, wasn&rsquo;t finding anything on wireshark either apart from that one note from <code>reminder.txt</code> telling us that there is github repository with sensitive information. I remembered that in the investigation&rsquo;s scenario , it mentioned an OSINT element . So i googled this exact term <code>github forela</code> and found a public repo:</p>
+<p><img src="/static/images/knockknock/18.png"></p>
+<p>I explored the <code>internal-dev.yaml</code> file then went into <code>commit history</code> and found a removed commit. There i found the SSH user <code>cyberjunkie</code> and his pass <code>YHUIhnollouhdnoamjndlyvbl398782bapd</code>.</p>
+<p>Never commit sensitive information directly to the repository especially if it&rsquo;s public as it can be accessed by anyone and poses a serious security risk.</p>
+<p>Answer: <code>YHUIhnollouhdnoamjndlyvbl398782bapd</code></p>
+<hr>
+<p>Q19.
+Whats the full url from where attacker downloaded ransomware?</p>
+<p>Using this filter , i was able to get the ssh server&rsquo;s IP (<code>172.31.39.46</code>)</p>
+<p><code>ip.addr==3.109.209.43 &amp;&amp; ssh</code></p>
+<p><img src="/static/images/knockknock/19.png"></p>
+<p>Since the attacker now have gained access to the ssh server with previously found creds, the download for the ransomware will happen from that ssh server , so i used it in my filters:</p>
+<p><code>ip.addr==172.31.39.46 &amp;&amp; http</code></p>
+<p>and found a GET request for a <code>Ransomware2_server.zip</code> file after scrolling through the packets.
+<img src="/static/images/knockknock/19a.png"></p>
+<p>Answer:<code>http[:]//13.233.179.35/PKCampaign/Targets/Forela/Ransomware2_server.zip</code></p>
+<hr>
+<p>Q20.
+Whats the tool/util name and version which attacker used to download ransomware?</p>
+<p>Can be found in the packet&rsquo;s HTTP layer information.
+<img src="/static/images/knockknock/20.png"></p>
+<p>Answer: <code>Wget/1.21.2</code></p>
+<p>Q21.
+Whats the ransomware name?</p>
+<p>Did this in a VM.</p>
+<p>I exported the ransomware file from wireshark and unzipped it. There i found the source code for the ransomware. Its written in python and the name is <code>GonnaCry</code>.
+There is also a presentation slide explaining the malware&rsquo;s feature but its in Portuguese and i dont understand Portuguese.</p>
+<p><code>GonnaCry</code></p>
+<hr>
+<h5 id="analysis-summary">Analysis Summary:</h5>
+<p>An attacker from IP <strong>3.109.209.43</strong> exploited an exposed Dev server (<strong>172.31.39.46</strong>) by scanning for open ports and using leaked FTP credentials to gain initial access. The TA (threat Actor) bypassed further controls using PORT KNOCKING to unlock a hidden service and extracted internal credentials from a config file.</p>
+<p>The TA then used an exposed SSH password found in a public GitHub repo related to that Dev server to gain full access as user <code>cyberjunkie</code> which the attacker then further used to download a ransomware named GonnaCry via <code>wget</code> tool. Also multiple internal files including AWS creds , MySQL database creds and company secrets were compromised.</p>
+<hr>
+<p>All documenting and solving took me almost 2 days . Worth it though.</p>
+<hr>
+]]></content>
+        </item>
+        
+        <item>
             <title>HTB NeuroSync-D</title>
             <link>http://localhost:1313/posts/htb-sherlock-neurosync/</link>
             <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
