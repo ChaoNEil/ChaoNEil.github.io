@@ -37,6 +37,13 @@
       <description>Sherlocks - Medium Sherlock Scenario&#xA;A critical Forela Dev server was targeted by a threat group. The Dev server was accidentally left open to the internet which it was not supposed to be. The senior dev Abdullah told the IT team that the server was fully hardened and it&amp;rsquo;s still difficult to comprehend how the attack took place and how the attacker got access in the first place. Forela recently started its business expansion in Pakistan and Abdullah was the one IN charge of all infrastructure deployment and management.</description>
     </item>
     <item>
+      <title>HTB Kuber</title>
+      <link>http://localhost:1313/posts/kuber/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      <guid>http://localhost:1313/posts/kuber/</guid>
+      <description>Sherlocks - Easy Sherlock Scenario&#xA;As a digital forensics investigator, you received an urgent request from a client managing multiple proxy Kubernetes clusters. The client reports unusual behavior in one of their development environments, where they were testing a proxy via SSH. This environment was exposed to the internet, raising concerns about a potential security breach. You have been provided with a dump of the kube-system namespace, as most of the testing activity occurred there.</description>
+    </item>
+    <item>
       <title>HTB NeuroSync-D</title>
       <link>http://localhost:1313/posts/htb-sherlock-neurosync/</link>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
