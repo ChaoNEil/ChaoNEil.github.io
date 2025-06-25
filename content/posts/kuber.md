@@ -9,6 +9,8 @@ title = 'HTB Kuber'
 As a digital forensics investigator, you received an urgent request from a client managing multiple proxy Kubernetes clusters. The client reports unusual behavior in one of their development environments, where they were testing a proxy via SSH. This environment was exposed to the internet, raising concerns about a potential security breach. You have been provided with a dump of the `kube-system` namespace, as most of the testing activity occurred there. Your task is to thoroughly analyze the data and determine if the system has been compromised.
 
 ---
+**Artifcats**:
+
 We are given kube-system dump files which are basically kubernetes resource data files.
 
 I am using VS code for this one.

@@ -495,6 +495,7 @@ As a digital forensics investigator, you received an urgent request from a clien
 <p><strong>Sherlock Scenario</strong></p>
 <p>As a digital forensics investigator, you received an urgent request from a client managing multiple proxy Kubernetes clusters. The client reports unusual behavior in one of their development environments, where they were testing a proxy via SSH. This environment was exposed to the internet, raising concerns about a potential security breach. You have been provided with a dump of the <code>kube-system</code> namespace, as most of the testing activity occurred there. Your task is to thoroughly analyze the data and determine if the system has been compromised.</p>
 <hr>
+<p><strong>Artifcats</strong>:</p>
 <p>We are given kube-system dump files which are basically kubernetes resource data files.</p>
 <p>I am using VS code for this one.</p>
 <hr>
