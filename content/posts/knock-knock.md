@@ -19,7 +19,7 @@ Which ports did the attacker find open during their enumeration phase?
 I know for a fact that nmap sends `TCP SYN` packets to target server to scope out possible open ports. 
 I went into wireshark's `statistics ---> Endpoints` and sorted by most packets. Found a weird looking (3.109.209.43) recurring IP address sending tons of syn packets to a static destination address (172.31.39.46)
 Possible sus ip : 3.109.209.43
-![](/static/images/knockknock/1.png)
+![](/images/knockknock/1.png)
 
 To further clear out the noise i tweaked the filter a bit:
 `ip.addr==3.109.209.43`
@@ -50,7 +50,7 @@ Remove the previous final filter and apply initial filter
 
 This will show us the nmap scan.
 
-![](/static/images/knockknock/2.png)
+![](/images/knockknock/2.png)
 
 ---
 Q3.
@@ -58,7 +58,7 @@ What's the MITRE Technique ID of the technique attacker used to get initial acce
 
 Using the filter above , scroll down near the end. You will see some TCP packets sent to port 21 and eventually you will see FTP packets . Going down further , you will see user `alonzo.spire` trying to gain access to his account followed by a brute force password spraying attack by the attacker.
 
-![](/static/images/knockknock/3.png)
+![](/images/knockknock/3.png)
 
 After port scanning, the attacker found several open ports and has decided to attack FTP port 21 instead. He opted for password spraying (a form of brute force attack) in hopes of getting a hit for the user `alzono.spire` or `tony.shephard` or `lin.bayley`.  
 
@@ -99,10 +99,10 @@ To answer this question , i found the config data and creds from the `.backup` f
 At first glance , i thought i knew what is going on, but after carefully analyzing this, honestly have no idea. I only recognize the command `iptables` so this might be doing something related to getting access to a particular port ? idk .
 
 Further analysis of this will be done in question 8.
-![](/static/images/knockknock/6.png)
+![](/images/knockknock/6.png)
 
 The attacker also got creds to a mysql database server from the `.fetch` file, see below ss:
-![](/static/images/knockknock/6a.png)
+![](/images/knockknock/6a.png)
 
 ---
 Q7.
@@ -153,10 +153,10 @@ I used this filter `ip.addr==3.109.209.43 && tcp.port==24456`
 
 I was glancing through each packets looking at the hex dump pane and found out that the packet number `210797` includes the password that i saw in the `.backup` file. 
 
-![](/static/images/knockknock/12.png)
+![](/images/knockknock/12.png)
 
 Also after following `TCP stream` on this packet, we can see the complete conversation gaining further insights. The hex dump pane also showed that this is an internal FTP server.
-![](/static/images/knockknock/12a.png)
+![](/images/knockknock/12a.png)
 
 
 Answer `21/03/2023 11:00:01`
@@ -170,17 +170,17 @@ I had to consult my old friend Google and it turns out Wireshark is doing this b
 
 To fix this , i decoded the packets to ftp . Right click on a non-clear ftp packet and `decode as ftp` . 
 
-![](/static/images/knockknock/13.png)
+![](/images/knockknock/13.png)
 
 The display is now clear, and the FTP data appears properly formatted, just as it should be.
 
 I `followed TCP stream` and there are some files the attacker downloaded as well as the entire conversation.
 
-![](/static/images/knockknock/13a.png)
+![](/images/knockknock/13a.png)
 
 Now to view them for myself, I `exported objects` from now reprocessed ftp data.
 
-![](/static/images/knockknock/13b.png)
+![](/images/knockknock/13b.png)
 
 I found the AWS AccountID and Password for the developer "Abdullah" inside `.archived.sql` mysql dump.
 
@@ -228,7 +228,7 @@ Whats the SSH password which attacker used to access the server and get full acc
 
 Was very lost on this one, wasn't finding anything on wireshark either apart from that one note from `reminder.txt` telling us that there is github repository with sensitive information. I remembered that in the investigation's scenario , it mentioned an OSINT element . So i googled this exact term `github forela` and found a public repo:
 
-![](/static/images/knockknock/18.png)
+![](/images/knockknock/18.png)
 
 I explored the `internal-dev.yaml` file then went into `commit history` and found a removed commit. There i found the SSH user `cyberjunkie` and his pass `YHUIhnollouhdnoamjndlyvbl398782bapd`. 
 
@@ -244,14 +244,14 @@ Using this filter , i was able to get the ssh server's IP (`172.31.39.46`)
 
 `ip.addr==3.109.209.43 && ssh`
 
-![](/static/images/knockknock/19.png)
+![](/images/knockknock/19.png)
 
 Since the attacker now have gained access to the ssh server with previously found creds, the download for the ransomware will happen from that ssh server , so i used it in my filters:
 
 `ip.addr==172.31.39.46 && http`
 
 and found a GET request for a `Ransomware2_server.zip` file after scrolling through the packets.
-![](/static/images/knockknock/19a.png)
+![](/images/knockknock/19a.png)
 
 Answer:`http[:]//13.233.179.35/PKCampaign/Targets/Forela/Ransomware2_server.zip`
 
@@ -260,7 +260,7 @@ Q20.
 Whats the tool/util name and version which attacker used to download ransomware?
 
 Can be found in the packet's HTTP layer information.
-![](/static/images/knockknock/20.png)
+![](/images/knockknock/20.png)
 
 Answer: `Wget/1.21.2`
 
