@@ -62,7 +62,7 @@
       <link>http://localhost:1313/posts/reverse-engineer-fundamentals/</link>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
       <guid>http://localhost:1313/posts/reverse-engineer-fundamentals/</guid>
-      <description>These are all notes I took while learning reverse engineering. Complement them with further research, including videos and other resources.&#xA;RE theory&#xA;When you compile a binary in C , what happens ? gcc myProgram.c -o myProgram.exe&#xA;It goes through these 4 stages , this is called Language Processing System.&#xA;(Preprocessor &amp;mdash;&amp;gt; Compiler &amp;mdash;&amp;gt; Assembler &amp;mdash;&amp;gt; Linker ) &amp;mdash;-&amp;gt; myProgram.exe&#xA;&amp;ndash;&#xA;Now what happens when we run that program exe file ?</description>
+      <description>These are all notes I took while learning reverse engineering (still a work in progress). I plan to complement them with further research, including videos and other resources. This is very uncharted territory for me so bear with me.&#xA;RE theory&#xA;When you compile a binary in C , what happens ? gcc myProgram.c -o myProgram.exe&#xA;It goes through these 4 stages , this is called Language Processing System.&#xA;(Preprocessor &amp;mdash;&amp;gt; Compiler &amp;mdash;&amp;gt; Assembler &amp;mdash;&amp;gt; Linker ) &amp;mdash;-&amp;gt; myProgram.</description>
     </item>
     <item>
       <title>Whoami</title>

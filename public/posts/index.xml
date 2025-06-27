@@ -690,14 +690,12 @@ and click on the last packet and select &rsquo;line based text data&rsquo; under
             <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
             
             <guid>http://localhost:1313/posts/reverse-engineer-fundamentals/</guid>
-            <description>These are all notes I took while learning reverse engineering. Complement them with further research, including videos and other resources.
+            <description>These are all notes I took while learning reverse engineering (still a work in progress). I plan to complement them with further research, including videos and other resources. This is very uncharted territory for me so bear with me.
 RE theory
 When you compile a binary in C , what happens ? gcc myProgram.c -o myProgram.exe
 It goes through these 4 stages , this is called Language Processing System.
-(Preprocessor &amp;mdash;&amp;gt; Compiler &amp;mdash;&amp;gt; Assembler &amp;mdash;&amp;gt; Linker ) &amp;mdash;-&amp;gt; myProgram.exe
-&amp;ndash;
-Now what happens when we run that program exe file ?</description>
-            <content type="html"><![CDATA[<p>These are all notes I took while learning reverse engineering. Complement them with further research, including videos and other resources.</p>
+(Preprocessor &amp;mdash;&amp;gt; Compiler &amp;mdash;&amp;gt; Assembler &amp;mdash;&amp;gt; Linker ) &amp;mdash;-&amp;gt; myProgram.</description>
+            <content type="html"><![CDATA[<p>These are all notes I took while learning reverse engineering (still a work in progress). I plan to complement them with further research, including videos and other resources. This is very uncharted territory for me so bear with me.</p>
 <hr>
 <p><strong>RE theory</strong></p>
 <h3 id="when-you-compile-a-binary-in-c--what-happens-">When you compile a binary in C , what happens ?</h3>

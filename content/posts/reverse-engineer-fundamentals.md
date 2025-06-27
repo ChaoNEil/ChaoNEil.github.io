@@ -3,7 +3,7 @@ title = 'Reverse Engineering fundamentals'
 +++
 
 
-These are all notes I took while learning reverse engineering. Complement them with further research, including videos and other resources.
+These are all notes I took while learning reverse engineering (still a work in progress). I plan to complement them with further research, including videos and other resources. This is very uncharted territory for me so bear with me.
 
 ---
 
@@ -171,3 +171,4 @@ Also learning how to use  *x64 debugger* helps big time as you can see registers
 **No more notes now atm. Will add more when I understand more or might not add here at all.**
 
 ---
+
