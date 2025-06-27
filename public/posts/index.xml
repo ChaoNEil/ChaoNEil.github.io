@@ -684,5 +684,130 @@ and click on the last packet and select &rsquo;line based text data&rsquo; under
 ]]></content>
         </item>
         
+        <item>
+            <title>Reverse Engineering fundamentals</title>
+            <link>http://localhost:1313/posts/reverse-engineer-fundamentals/</link>
+            <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+            
+            <guid>http://localhost:1313/posts/reverse-engineer-fundamentals/</guid>
+            <description>These are all notes I took while learning reverse engineering. Complement them with further research, including videos and other resources.
+RE theory
+When you compile a binary in C , what happens ? gcc myProgram.c -o myProgram.exe
+It goes through these 4 stages , this is called Language Processing System.
+(Preprocessor &amp;mdash;&amp;gt; Compiler &amp;mdash;&amp;gt; Assembler &amp;mdash;&amp;gt; Linker ) &amp;mdash;-&amp;gt; myProgram.exe
+&amp;ndash;
+Now what happens when we run that program exe file ?</description>
+            <content type="html"><![CDATA[<p>These are all notes I took while learning reverse engineering. Complement them with further research, including videos and other resources.</p>
+<hr>
+<p><strong>RE theory</strong></p>
+<h3 id="when-you-compile-a-binary-in-c--what-happens-">When you compile a binary in C , what happens ?</h3>
+<p><code>gcc myProgram.c -o myProgram.exe</code></p>
+<p>It goes through these 4 stages , this is called <code>Language Processing System</code>.</p>
+<p>(Preprocessor &mdash;&gt; Compiler &mdash;&gt; Assembler &mdash;&gt; Linker ) &mdash;-&gt; myProgram.exe</p>
+<p>&ndash;</p>
+<h4 id="now-what-happens-when-we-run-that-program-exe-file-">Now what happens when we run that program exe file ?</h4>
+<p>The program goes through a Loader. The loader will take the program and load it into main memory or   <em><strong>RAM</strong></em>.</p>
+<p>Inside the RAM, there will be sections loaded by the loader inside the PE (portable executable file or exe) file. Common ones are <code>.text, .data, Heap, Stack.</code></p>
+<pre tabindex="0"><code>.text: has all the program (exe) file instructions. Basically all translated to the assembly code from high level C code.  
+
+.data: stores Initialized and static data
+			eg: int variableName = 10;
+
+.bss (block starting symbol): stores uninitialized varibles . 
+						eg: int vairableName; 
+</code></pre><pre tabindex="0"><code>Heap: 
+stores Dynamically allocated variables (allocated at runtime). 
+it grows towards higher memory addresses , which means DOWNward visually speaking. 0x00000000
+EXAMPLE: initialzing a array[], we dont know the size before hand until the user tells us how many numbers they want
+
+
+Stack:
+stores local variables, function parameters, return adresses and grows toward lower memory addresses, which means UPward visually speaking.
+0x7fffffff
+</code></pre><h4 id="okay-now-where-does-it-go-from-the-ram">Okay, now Where does it go from the RAM?</h4>
+<p>It goes to the CPU (central processing Unit). Inside the CPU, the instructions from the RAM comes to the CU (control unit). From the CU , it goes to the ALU (arithmetic control unit) which executes instruction and sets <em>registers</em> and flags.</p>
+<p>RAM &mdash;&gt; CPU ( [control unit &mdash;&gt; ALU &mdash;&gt; different registers, back and forth] )</p>
+<p>Registers are very fast and ephemeral ( lasts very less ).</p>
+<p><strong>Some Registers</strong>:</p>
+<pre tabindex="0"><code>+------------------------+ 64-bit → RAX
+|        RAX             |
++------------+-----------+
+             |
+           EAX (bits 0–31) 32bit
+             |
+           AX  (bits 0–15) 16bit
+           / \
+         AH  AL (8 bits each)
+
+This is the x86/x64 CPU register architecture. Basically the accumulator or any register can be named differently based on cpu architectures.
+
+So when we are going to work with a 64bit exe file or a 32bit, expect different names for the registers.
+
+Similarilly for the stack pointer:
+	RSP, ESP or SP(8bits)
+
+....and it goes on for every register.
+</code></pre><p><em>Accumulators</em> (rax,eax,ax):
+used for input/output, arithmetic and return values from functions.</p>
+<p><em>Base</em> (rbx, ebx, bx):
+used for indexed addressing</p>
+<p><em>Counter</em> (rcx, ecx, cx):
+stores loop count variables in iterative operations. eg for loops/while loops</p>
+<p><em>Data</em> (rdx, edx, dx):
+input/output operations and sometimes extends rax for multiply /divide</p>
+<p><em>Stack Pointer</em> (rsp, esp, sp):
+stores current position within the stack</p>
+<p><em>Base Pointer</em> (rbp, ebp, bp):
+helps in referencing parameter and other stack variables by providing a fixed point in the stack, so they can be accessed using simple offsets. Holds the base of our current stack frame</p>
+<p><em>Instruction Pointer</em> (rip,eip,ip):
+stores next instruction to be executed</p>
+<p><em>Source and Destination registers</em> (rsi/esi , rdi/edi ):
+used as a source and destination indexes for string operations</p>
+<p><em>flag registers</em>:
+CF (carry flag) , ZF(zero flag), TF (trap flag)</p>
+<p>These can be nicely visualized in <code>x64 debugger</code>, a fantastic RE (debugging) tool.</p>
+<p><strong>some Common x86  Instructions</strong>:</p>
+<p>Read from right to left. Forget your everyday English reading convention.</p>
+<pre tabindex="0"><code>`mov eax, ebx`    copies the value in ebx to eax .  
+
+`mov eax, [0x70000000]`   move whatever value is in the memory address `[]` to eax. Brackets means &#34;go-to-that-address first then load that data&#34;
+
+`nop`   No operation and do absolutely nothing,
+
+`lea eax, [ebx+esi*4]`   load effective address, similar to move but it loads ebx+esi*4 instead of the data of that address like we saw at the bracketed [] address do. 
+
+xor eax, eax;or eax, ebx
+they take 2 registers , compare them, and stores the result in a flag register.
+
+There are many examples but i am not goin to note it down.
+ etc ........
+</code></pre><p><em>Stack operations:</em>
+&hellip;.also instructions</p>
+<p><code>push eax; pop ebx</code></p>
+<p><code>push</code> means putting values to the top of the stack frame and <code>pop</code> means , removing them from the top of the stack.</p>
+<p><em>Call instructions:</em>
+<code>call 0x41400000</code>    (sometimes we might see the function name here instead of hex value.)</p>
+<p>calls a function; moves the value of EIP to stack and sets EIP to the start of the function at 0x41400000.  So that it knows what to do after finishing that function, i.e. , starting the next instruction.</p>
+<p><code>ret</code>   Pops the return address off of the stack into EIP.</p>
+<p>All these cluster of <em>info</em> happens in the CPU</p>
+<hr>
+<p>Day 2.</p>
+<h3 id="inner-workings-of-the-stack">Inner Workings of the Stack</h3>
+<pre tabindex="0"><code>^
+I    0x00000000   Lower level addresses        (ESP)
+I
+I
+I
+I
+I    0x7fffffff      Higher level addresses         (EBP)
+I
+</code></pre><p>The stack grows UP, to lower level addresses. When we say pop something of from the stack, it always means remove a item from the TOP of the stack.</p>
+<p>To solidify the concepts here , do some practice CrackMEs.</p>
+<p>Also learning how to use  <em>x64 debugger</em> helps big time as you can see registers , function calls on the stack and much more.</p>
+<p><strong>No more notes now atm. Will add more when I understand more or might not add here at all.</strong></p>
+<hr>
+]]></content>
+        </item>
+        
     </channel>
 </rss>
