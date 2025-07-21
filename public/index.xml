@@ -65,6 +65,13 @@
       <description>These are all notes I took while learning reverse engineering (still a work in progress). I plan to complement them with further research, including videos and other resources. This is very uncharted territory for me so bear with me.&#xA;RE theory&#xA;When you compile a binary in C , what happens ? gcc myProgram.c -o myProgram.exe&#xA;It goes through these 4 stages , this is called Language Processing System.&#xA;(Preprocessor &amp;mdash;&amp;gt; Compiler &amp;mdash;&amp;gt; Assembler &amp;mdash;&amp;gt; Linker ) &amp;mdash;-&amp;gt; myProgram.</description>
     </item>
     <item>
+      <title>SOC Active Directory Project with Splunk, Shuffle and Slack</title>
+      <link>http://localhost:1313/posts/soc-lab/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      <guid>http://localhost:1313/posts/soc-lab/</guid>
+      <description>Logical Diagram / Setup Structure CompanyX-ADDC01 ip 139.x.x.x public&#xD;CompanyX-ADDC01 ip 10.51.96.4 private&#xD;Test instance ip 139.x.x.x public&#xD;Test instance&#x9;ip 10.51.96.3 private&#xD;CompanyX-Splunk ip 139.x.x.x public&#xD;CompanyX-Splunk ip 10.51.96.5 private Using Vultr cloud resources , I set up 3 different machines:&#xA;1 splunk ubuntu machine that will be the splunk server&#xD;1 Active directory machine 1 test windows machine&#xD;I have set up a VPC network so that all 3 machines could interact nicely.</description>
+    </item>
+    <item>
       <title>Whoami</title>
       <link>http://localhost:1313/whoami/</link>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
