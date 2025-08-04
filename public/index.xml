@@ -65,7 +65,14 @@
       <description>These are all notes I took while learning reverse engineering (still a work in progress). I plan to complement them with further research, including videos and other resources. This is very uncharted territory for me so bear with me.&#xA;RE theory&#xA;When you compile a binary in C , what happens ? gcc myProgram.c -o myProgram.exe&#xA;It goes through these 4 stages , this is called Language Processing System.&#xA;(Preprocessor &amp;mdash;&amp;gt; Compiler &amp;mdash;&amp;gt; Assembler &amp;mdash;&amp;gt; Linker ) &amp;mdash;-&amp;gt; myProgram.</description>
     </item>
     <item>
-      <title>SOC Active Directory Project with Splunk, Shuffle and Slack</title>
+      <title>SOAR EDR Cloud Project (LimaCharlie and Tines)</title>
+      <link>http://localhost:1313/posts/soc-lab2/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      <guid>http://localhost:1313/posts/soc-lab2/</guid>
+      <description>Integration of SOAR and EDR featuring LimaCharlie and Tines. Learning how to automate security workflows, and enhancing cybersecurity posture effectively.&#xA;For VMs, I will be using Vultr cloud resources again. I have spun a windows 10 machine with firewalls configured to RDP only from my public IP.&#xA;Project Main Takeaways: Creating custom detection &amp;amp; response rule in LimaCharlie&#xD;Creating a playbook that integrates Slack, Tines, Email.&#xD;Playbook contents:&#xD;1. Send a Slack message&#xD;2.</description>
+    </item>
+    <item>
+      <title>SOC Active Directory Cloud Project (Splunk, Shuffle and Slack)</title>
       <link>http://localhost:1313/posts/soc-lab/</link>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
       <guid>http://localhost:1313/posts/soc-lab/</guid>

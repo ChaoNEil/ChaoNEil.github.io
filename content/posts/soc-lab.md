@@ -1,6 +1,6 @@
 
 +++
-title = 'SOC Active Directory Project with Splunk, Shuffle and Slack'
+title = 'SOC Active Directory Cloud Project (Splunk, Shuffle and Slack)'
 +++
 
 

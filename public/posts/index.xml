@@ -808,7 +808,208 @@ I
         </item>
         
         <item>
-            <title>SOC Active Directory Project with Splunk, Shuffle and Slack</title>
+            <title>SOAR EDR Cloud Project (LimaCharlie and Tines)</title>
+            <link>http://localhost:1313/posts/soc-lab2/</link>
+            <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+            
+            <guid>http://localhost:1313/posts/soc-lab2/</guid>
+            <description>Integration of SOAR and EDR featuring LimaCharlie and Tines. Learning how to automate security workflows, and enhancing cybersecurity posture effectively.
+For VMs, I will be using Vultr cloud resources again. I have spun a windows 10 machine with firewalls configured to RDP only from my public IP.
+Project Main Takeaways: Creating custom detection &amp;amp; response rule in LimaCharlieCreating a playbook that integrates Slack, Tines, Email.Playbook contents:1. Send a Slack message2.</description>
+            <content type="html"><![CDATA[<p>Integration of SOAR and EDR featuring LimaCharlie and Tines.
+Learning how to automate security workflows, and enhancing cybersecurity posture effectively.</p>
+<p>For VMs, I will be using Vultr cloud resources again. I have spun a windows 10 machine with firewalls configured to RDP only from my public IP.</p>
+<h2 id="project-main-takeaways">Project Main Takeaways:</h2>
+<pre><code>Creating custom detection &amp; response rule in LimaCharlie
+Creating a playbook that integrates Slack, Tines, Email.
+
+ Playbook contents:
+1. Send a Slack message
+2. Send an Email (containing info about the detection)
+3. Generate a user prompt (asking analyst to isolate machine yes/no)
+4. If Yes, then Isolate.
+</code></pre>
+<hr>
+<h4 id="part-1-objective-">Part 1 Objective :</h4>
+<ol>
+<li>Setting up LimaCharlie on my laptop.</li>
+<li>Connecting my cloud windows VM to LimaCharlie.</li>
+</ol>
+<p>Created an account on LimaCharlie and followed the required steps.  LimaCharlie gives us a basic guide after we create an account.</p>
+<p>Under <code>Sensors</code> in limaCharlie, I went to <code>Installation Keys</code> and created a new key.
+This key will be needed in order to install the endpoint sensor onto my Windows VM.
+On the same page, under <code>Sensor Downloads</code>, I copied the Windows64 bit download link and pasted onto my VM and to install it, I followed the DOCS.</p>
+<p><img src="/images/soc-lab2/1.png"></p>
+<p>To confirm it is installed , I checked the <code>sensors</code> page and there it was:
+We can click it to view additional details.</p>
+<p><img src="/images/soc-lab2/2.png"></p>
+<p>We can view various information on the left side to find evil.</p>
+<p><img src="/images/soc-lab2/3.png"></p>
+<p>For example, to look for persistence ,  I can look at the <code>autoruns</code> section. I can also run remote commands from the <code>console</code> section. I can even kill processes:</p>
+<p><img src="/images/soc-lab2/4.png"></p>
+<hr>
+<h4 id="part-2-objective-">Part 2 Objective :</h4>
+<ol>
+<li>Generating Telemetry with Lazagne (a password recovery tool).</li>
+<li>Creating detection and response rules.</li>
+</ol>
+<p>I downloaded Lazagne and ran it using powershell.
+It also got picked up in LimaCharlie , under the <code>Timeline</code> section , we can see the detection.</p>
+<p><img src="/images/soc-lab2/5.png"></p>
+<p>To get further info on that file , we can click on the <code>New_Process</code> event and it will show file hashes, username, parent process id and many more which can aid us in the investigation process.</p>
+<p>Now to create detection and rules, I went to <code>D&amp;R Rules</code> under <code>Automation</code> section.
+There we can add a new rule.</p>
+<p>This is for detecting lazagne:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-C" data-lang="C"><span style="display:flex;"><span>events:
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">-</span> NEW_PROCESS
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">-</span> EXISTING_PROCESS
+</span></span><span style="display:flex;"><span>op: and
+</span></span><span style="display:flex;"><span>rules:
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">-</span> op: is windows
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">-</span> op: or
+</span></span><span style="display:flex;"><span>    rules:
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">-</span> <span style="color:#66d9ef">case</span> sensitive: false
+</span></span><span style="display:flex;"><span>      op: ends with
+</span></span><span style="display:flex;"><span>      path: event<span style="color:#f92672">/</span>FILE_PATH
+</span></span><span style="display:flex;"><span>      value: LaZagne.exe
+</span></span><span style="display:flex;"><span>      
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">-</span> <span style="color:#66d9ef">case</span> sensitive: false
+</span></span><span style="display:flex;"><span>      op: contains
+</span></span><span style="display:flex;"><span>      path: event<span style="color:#f92672">/</span>COMMAND_LINE
+</span></span><span style="display:flex;"><span>      value: LaZagne
+</span></span><span style="display:flex;"><span>      
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">-</span> <span style="color:#66d9ef">case</span> sensitive: false
+</span></span><span style="display:flex;"><span>      op: ends with
+</span></span><span style="display:flex;"><span>      path: event<span style="color:#f92672">/</span>COMMAND_LINE
+</span></span><span style="display:flex;"><span>      value: all
+</span></span><span style="display:flex;"><span>      
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">-</span> <span style="color:#66d9ef">case</span> sensitive: false
+</span></span><span style="display:flex;"><span>      op: is
+</span></span><span style="display:flex;"><span>      path: event<span style="color:#f92672">/</span>HASH
+</span></span><span style="display:flex;"><span>      value: <span style="color:#960050;background-color:#1e0010">&#39;</span><span style="color:#ae81ff">3</span>cc5ee93a9ba1fc57389705283b760c8bd61f35e9398bbfa3210e2becf6d4b05<span style="color:#960050;background-color:#1e0010">&#39;</span>
+</span></span></code></pre></div><p>This rule gets triggered when a <code>new</code> or <code>existing process</code> is detected and sets this condition which must be true:</p>
+<ol>
+<li>The OS is Windows</li>
+<li>At least one of the following is true:
+<ul>
+<li>File path ends with <code>LaZagne.exe</code></li>
+<li>Command line contains <code>LaZagne</code></li>
+<li>Command line ends with <code>all</code></li>
+<li>File hash matches: <code>3cc5ee93a9ba1fc57389705283b760c8bd61f35e9398bbfa3210e2becf6d4b05</code></li>
+</ul>
+</li>
+</ol>
+<p>If detected, this will be the response:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-C" data-lang="C"><span style="display:flex;"><span><span style="color:#f92672">-</span> action: report
+</span></span><span style="display:flex;"><span>  metadata:
+</span></span><span style="display:flex;"><span>    author: ChaoNeil
+</span></span><span style="display:flex;"><span>    description: TEST <span style="color:#f92672">-</span> Detects Lazagne Usage
+</span></span><span style="display:flex;"><span>    falsepositive:
+</span></span><span style="display:flex;"><span>      <span style="color:#f92672">-</span> Unlikely
+</span></span><span style="display:flex;"><span>    level: medium
+</span></span><span style="display:flex;"><span>    tags:
+</span></span><span style="display:flex;"><span>      <span style="color:#f92672">-</span> attack.credential_access
+</span></span><span style="display:flex;"><span>  name: Hacktool Lazagne SOAR<span style="color:#f92672">-</span>EDR
+</span></span></code></pre></div><p>Under the <code>Advanced</code> tab of the <code>D&amp;R Rules</code> , I can test this rule to see if it works, just have to paste in the process event data from <code>Timeline</code> section.</p>
+<p><img src="/images/soc-lab2/6.png"></p>
+<p>It works! Also I ran lazagne.exe on my VM to generate this detection alert and looking at the <code>Detections</code> section , I can see an alert pop up:</p>
+<p><img src="/images/soc-lab2/7.png"></p>
+<p>It shows the <code>name</code> value as message in the response. I can simply click the alert, and it will show me detailed information.</p>
+<p><img src="/images/soc-lab2/8.png"></p>
+<hr>
+<h4 id="part-3-objective-">Part 3 Objective :</h4>
+<ol>
+<li>Setup Slack and Tines</li>
+<li>Test connection (LimaCharlie + Tines) to make sure our SOAR is seeing the detection generated by LimaCharlie.</li>
+</ol>
+<p><em>Tines is a tool that helps security and IT teams automate their work using AI.</em></p>
+<p>After signing up for Tines, I found the UI and workflow process comparable to Shuffle’s,
+maybe because both are <strong>SOAR (Security Orchestration, Automation, and Response)</strong> platforms designed to automate security workflows. So I found the process/workflow of integrating tines with LimaCharlie very similar.</p>
+<p>I took a webhook block in Tines and named it <code>Retrieve Detections</code> and copied the webhook URL to LimaCharlie&rsquo;s <code>output</code> section. <code>Outputs</code> allows us to integrate data from LimaCharlie into other cloud tools. In the Output&rsquo;s section there are 4 sub-sections that I need to specify (<code>Stream, Destination, Configure, Sample</code>).  Following this process, I pasted the webhook url in the <code>configure</code> tab and saved the output.</p>
+<p><img src="/images/soc-lab2/9.png"></p>
+<p>To generate sample, I reran <code>lazagne</code> on my cloud VM to generate alerts and to check if it was working as intended.</p>
+<p><strong>Testing connections:</strong></p>
+<p>When I checked back at <code>Tines</code>, I saw alerts being transmitted from over LimaCharlie. Working good so far.</p>
+<p><img src="/images/soc-lab2/10.png"></p>
+<p>The link between LimaCharlie and Tines has been established.</p>
+<hr>
+<h4 id="part-4-objective-">Part 4 Objective :</h4>
+<ol>
+<li>Create Playbook</li>
+<li>Playbook contents:
+<ol>
+<li>Send a Slack message</li>
+<li>Send an Email (containing info about the detection)</li>
+<li>Generate a user prompt (asking analyst to isolate machine yes/no)</li>
+<li>If Yes, then Isolate.</li>
+</ol>
+</li>
+</ol>
+<p>The alerts that I received in <code>Tines</code> now should also generate a message in <code>Slack</code> stating the above prompt. Now to do that, I added Tines app in slack via slack <code>automations</code> and followed the required steps.</p>
+<p><img src="/images/soc-lab2/11.png"></p>
+<p>After doing these steps I was able to link and establish connections between slack and tines.</p>
+<p>Setting up the workflow parameters in <code>tines</code> to send message to slack is similar to Shuffle, I had to copy channel ID of slack, type in the message that I want to convey etc. This is the output:</p>
+<p><img src="/images/soc-lab2/12.png"></p>
+<p>Now that I have confirmed that it can send messages, its time to send a message with details. I will use this format:</p>
+<pre tabindex="0"><code class="language-Message" data-lang="Message">- Title
+- Time
+- Computer Name
+- Source IP
+- Process
+- Command Line
+- File Path
+- Sensor ID
+- Link to the detection (if applicable)
+</code></pre><p>I will find these values to their respective field names that are similar to LimaCharlie&rsquo;s detection alerts. Eg: the <code>Computer Name</code> is referred as <code>hostname</code>. All can be found in under <code>events</code> in the <code>retrieve detection</code> webhook that i created earlier.</p>
+<pre tabindex="0"><code>Title: &lt;&lt;retrieve_detections.body.cat&gt;&gt; 
+Time: &lt;&lt;retrieve_detections.body.detect.routing.event_time&gt;&gt; 
+Computer Name: &lt;&lt;retrieve_detections.body.detect.routing.hostname&gt;&gt; 
+Source IP: &lt;&lt;retrieve_detections.body.detect.routing.int_ip&gt;&gt; 
+Username: &lt;&lt;retrieve_detections.body.detect.event.USER_NAME&gt;&gt;
+Process: &lt;&lt;retrieve_detections.body.detect.event.FILE_PATH&gt;&gt; 
+Command Line: &lt;&lt;retrieve_detections.body.detect.event.COMMAND_LINE&gt;&gt;
+Sensor ID: &lt;&lt;retrieve_detections.body.detect.routing.sid&gt;&gt;
+Detection Link: &lt;&lt;retrieve_detections.body.link&gt;&gt;
+</code></pre><p>This is the complete message format that I used to send message in slack. I pasted this in slack <code>message field</code> in tines.</p>
+<p><img src="/images/soc-lab2/13.png"></p>
+<p>And this is message that I got in Slack after testing run:</p>
+<p><img src="/images/soc-lab2/14.png"></p>
+<p>Pretty cool huh!</p>
+<p>I also implemented this in an email setting. I had to edit out the email body field in order to render it nicely.</p>
+<p><img src="/images/soc-lab2/15.png"></p>
+<p>&ndash;</p>
+<h4 id="adding-prompt-no">Adding Prompt (NO):</h4>
+<p>I have to now add a prompt asking to isolate the affected machine. I grabbed a <code>send email</code> block in <code>tines</code> and made a simple page with boolean (yes/no). In the page edit section, I copy-pasted my previous message format and it worked.</p>
+<p><img src="/images/soc-lab2/16.png"></p>
+<p>If the user selects No, It should send a message to Slack.
+To achieve that I pulled a <code>Trigger</code> block and configured it.  Under <code>Rules</code>, I selected the user prompt and set it to <code>false</code>, since this is what will &ldquo;trigger&rdquo; if it is selected &ldquo;No&rdquo;.
+Then I took another <code>slack message</code> block and edited it to include a message that will tell us what to do next if the condition is &ldquo;False&rdquo;.</p>
+<p>To test this whole workflow, I ran it from the start (webhook), got texts on my slack channel as well as my email, selected &ldquo;No&rdquo; and this was the resulting text that I received:</p>
+<p><img src="/images/soc-lab2/17.png"></p>
+<h4 id="adding-prompt-yes">Adding Prompt (YES):</h4>
+<p>Time to do the same but now for the &ldquo;Yes&rdquo; prompt which will isolate that machine from LimaCharlie. I grabbed another trigger block , renamed it to &ldquo;Yes&rdquo; and grabbed a <code>LimaCharlie</code> block from the templates. The template already had a &ldquo;isolate Sensor&rdquo; by default so I just edited that a little.
+Under the <code>Url</code> tab of that block, I specified the &ldquo;sid&rdquo; (sensor id) field value from the previous message format message.</p>
+<p><img src="/images/soc-lab2/18.png"></p>
+<p>However to send the isolation signal to LimaCharlie, I need to link the API key to Tines.</p>
+<p>From the tines&rsquo;s <code>credentials</code> section, I made a LimaCharlie API Key variable and saved it. I grabbed the key from <code>LimaCharlie --&gt; Access Management --&gt; REST API --&gt; Org JWT api key</code>.
+Then on my workflow page in Tines, under <code>Credentials</code>, I selected my newly created &ldquo;API KEY&rdquo; variable and linked it.</p>
+<p><img src="/images/soc-lab2/19.png"></p>
+<p>Then I re-ran the entire process and alas, the machine is now finally isolated. I confirmed it by going to the <code>Overview</code> section of my sensor in LimaCharlie.</p>
+<p>The VM will lose internet access unless it rejoins network.</p>
+<p><img src="/images/soc-lab2/20.png"></p>
+<p>I also added some text that will notify me in Slack if the machine is isolated. There is already a LimaCharlie template for that, just needed to edit the <code>sid</code> and link to limacharlie API.</p>
+<p>This is my workflow in the end:</p>
+<p><img src="/images/soc-lab2/21.png"></p>
+<hr>
+<h3 id="conclusion">Conclusion</h3>
+<p>This was my second SOC project and I must say I got pretty overwhelmed in the end. Even after following guides , I encountered many errors and got frustrated but eventually solved it.</p>
+<p>This project gave me hands-on experience integrating <strong>SOAR (Tines)</strong> and <strong>EDR (LimaCharlie)</strong> tools to automate security workflows. I learned how to create detection rules, trigger alerts, and build end-to-end response playbooks that involve Slack notifications, email prompts, and live host isolation. This process deepened my understanding of modern SOC operations and how orchestration platforms can significantly improve incident response efficiency.</p>
+<hr>
+]]></content>
+        </item>
+        
+        <item>
+            <title>SOC Active Directory Cloud Project (Splunk, Shuffle and Slack)</title>
             <link>http://localhost:1313/posts/soc-lab/</link>
             <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
             
