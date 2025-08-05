@@ -35,7 +35,7 @@ I have also set up firewall rules so that only I (from my local machine) with my
 
 ![](/images/soc-lab-project/1-edited.png)
 
-At this point in time, i can ping all of my 3 machines:
+At this point in time, I can ping all of my 3 machines:
 
 ![](/images/soc-lab-project/2.png)
 
@@ -56,7 +56,7 @@ Password: `[Redacted]`
 
 ![](/images/soc-lab-project/3.png)
 
-Now that i have created AD and DC server and a user, i will join the windows test machine to this Domain and authenticate it to the server using `jenny smith` user.
+Now that I have created AD and DC server and a user, I will join the windows test machine to this Domain and authenticate it to the server using `jenny smith` user.
 
 In the process of joining test-machine to the domain server, this error occurred :
 
@@ -79,7 +79,7 @@ After restarting test-machine , it will have a option to sign in as Other user. 
 
 ![](/images/soc-lab-project/8.png)
 
-After entering the creds, i encountered this error. Remote login is disabled.
+After entering the creds, I encountered this error. Remote login is disabled.
 To enable it, i accessed this test-machine from my vultr dashboard and allowed remote connections 
 ![](/images/soc-lab-project/9.png)
 
@@ -87,7 +87,7 @@ Added user `JSmith` to remote desktop users.
 
 ![](/images/soc-lab-project/10.png)
 
-Now i can RDP into test-machine normally as `JSmith`.
+Now I can RDP into test-machine normally as `JSmith`.
 
 ![](/images/soc-lab-project/11.png)
 
@@ -105,7 +105,7 @@ splunk username : [Redacted]
 splunk password : [Redacted]
 ```
 
-However to get it running on my host laptop, i had to first:
+However to get it running on my host laptop, I had to first:
 
 1.  add my public IP address in vultr cloud platform for splunk
 
@@ -123,7 +123,7 @@ I went to splunk indexes to set up my AD index.
 	~Google
 	
 
-To receive data from other machines, i set up a port 9997 which is the default.
+To receive data from other machines, I set up a port 9997 which is the default.
 
 `Forwarding and receiving >> Reveive data >> set port`
 
@@ -138,10 +138,10 @@ Again i had to `ufw allow 9997` to allow telemetry to flow to our host laptop.
 
 ![](/images/soc-lab-project/15.png)
 
-And after doing all that , i had data finally.
+And after doing all that , I had data finally.
 
 
-Now i had to do all that again for my Domain controller machine.
+Now I had to do all that again for my Domain controller machine.
 
 End result:
 
@@ -162,7 +162,7 @@ My public IP starts with `49.*` , hypothetically lets say, if an authentication 
 
 ![](/images/soc-lab-project/17.png)
 
-This is the query that i created in splunk :
+This is the query that I created in splunk :
 ```C
 index="companyx-ad" EventCode=4624 (Logon_Type=7 OR Logon_Type=10) Source_Network_Address=* Source_Network_Address!=49.*
 
@@ -174,7 +174,7 @@ Event Code 4624 is for "Successful Login" and under this event:
 
 I will login from a kali machine with VPN to trigger this alert . I have also set my firewall to accept RDP connections from `anywhere`.
 
-Here i got a result back after running above query while earlier it was null.
+Here I got a result back after running above query while earlier it was null.
 
 ![](/images/soc-lab-project/18.png)
 A successful login from Sweden. 
@@ -213,14 +213,14 @@ I got an alert from splunk:
 
 ![](/images/soc-lab-project/22.png)
 
-The alerting works and now i want it all sent to my slack as a notification so i can get notified to my phone etc, even when i am AFK.
+The alerting works and now I want it all sent to my slack as a notification so I can get notified to my phone etc, even when I am AFK.
 
 Linked slack and authenticated to receive alerts.
 
 ![](/images/soc-lab-project/23.png)
 
 
-Following up, I clicked the slack block and filled in the values . In the `Find Actions` field , i selected `Chat Postmessage` meaning i want the slack alert bot to send me message . In the `Text` field , i filled up the important parameters that i want to see in an alert like username , time etc.
+Following up, I clicked the slack block and filled in the values . In the `Find Actions` field , I selected `Chat Postmessage` meaning I want the slack alert bot to send me message . In the `Text` field , I filled up the important parameters that I want to see in an alert like username , time etc.
 
 ![](/images/soc-lab-project/24.png)
 
@@ -246,11 +246,11 @@ We can now for example , include user input. It can work something like `"Do you
 The alerts can be emailed to respective SOC analyst's shared email so that all the soc analysts on the shift can see it. There are many options in shuffle like `user-input` app . There is even a SMS option. 
 
 Shuffle is very versatile so we can drag and drop many different apps and connect/link the nodes to it and make the workflow to our liking. 
-For example , lets go beyond this and ask the analyst if `he/she wants to disable that particular account`. To achieve that , i must connect the `user-action` app to `active directory` app. There is a disable user option already in the AD app, i will select that and fill in the required values. I will also allow port 389 in the firewall for AD services. 
+For example , lets go beyond this and ask the analyst if `he/she wants to disable that particular account`. To achieve that , I must connect the `user-action` app to `active directory` app. There is a disable user option already in the AD app, I will select that and fill in the required values. I will also allow port 389 in the firewall for AD services. 
 
 
 
-After running the workflow in shuffle, i received this alert email:
+After running the workflow in shuffle, I received this alert email:
 
 ![](/images/soc-lab-project/26.png)
 
