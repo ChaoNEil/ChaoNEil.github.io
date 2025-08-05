@@ -167,8 +167,9 @@ This is the query that i created in splunk :
 index="companyx-ad" EventCode=4624 (Logon_Type=7 OR Logon_Type=10) Source_Network_Address=* Source_Network_Address!=49.*
 
 
-Logon Type 7 occurs when a user unlocks their machine
-Logon Type 10 indicates a user logging into a computer remotely
+Event Code 4624 is for "Successful Login" and under this event:
+	Logon Type 7 occurs when a user unlocks their machine
+	Logon Type 10 indicates a user logging into a computer remotely
 ```
 
 I will login from a kali machine with VPN to trigger this alert . I have also set my firewall to accept RDP connections from `anywhere`.
