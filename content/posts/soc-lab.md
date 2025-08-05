@@ -274,7 +274,7 @@ This was the final iteration of the workflow that was used:
 
 ##### Quick fixes:
 I had to create another account with domain admin privileges in order authenticate to AD in shuffle.
-Also many of things that I did here like RDP from `anywhere` , is only for testing purposes only. Never unnecessary ports to the internet.
+Also many of things that I did here like RDP from `anywhere` , is only for testing purposes only. Never open unnecessary ports to the internet.
 
 ----
 
