@@ -177,7 +177,7 @@ I will login from a kali machine with VPN to trigger this alert . I have also se
 Here I got a result back after running above query while earlier it was null.
 
 ![](/images/soc-lab-project/18.png)
-A successful login from Sweden. 
+A successful login was detected from Sweden. To identify the country of origin, I simply pasted the IP address into Google.
 
 Cleaning up the query a bit more by using `stats`
 ```c
