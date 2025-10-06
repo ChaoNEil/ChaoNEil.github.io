@@ -185,7 +185,7 @@ It will throw us on a landing page where you can view the attack map. There are 
 
 ![](/images/honeypot-project/10.png)
 
-Select the `"kibana"` option from the landing page and you will be presented with a dashboard in Elastic SIEM. You can filter it by IPs , ports , services attacked, passwords used to brute force, users attacked, etc. Play
+Select the `"kibana"` option from the landing page and you will be presented with a dashboard in Elastic SIEM. You can filter it by IPs , ports , services attacked, passwords used to brute force, users attacked, etc.
 
 ![](/images/honeypot-project/11.png)
 
