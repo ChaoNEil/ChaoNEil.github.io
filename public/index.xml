@@ -83,7 +83,7 @@
       <link>http://localhost:1313/posts/honeypot-project/</link>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
       <guid>http://localhost:1313/posts/honeypot-project/</guid>
-      <description>What is a honeypot? A Honeypot is a decoy system or network resource designed to attract, detect, and study cyberattacks by mimicking a legitimate and valuable target.It serves as a trap for attackers, luring them into a controlled environment where security professionals can observe and gather intel.&#xA;Project objective Deploy a production-style T-Pot honeypot instance, validate it’s collecting telemetry, and demonstrate basic analyst workflows: access the Kibana web UI, filter events (by IP/port/service), extract IOCs (IPs, usernames, passwords), and capture a short write-up showing one example incident (timeline + pcap or Sysmon/Suricata evidence).</description>
+      <description>What is a honeypot? A Honeypot is a decoy system or network resource designed to attract, detect, and study cyberattacks by mimicking a legitimate and valuable target.It serves as a trap for attackers, luring them into a controlled environment where security professionals can observe and gather intel.&#xA;Project objective Deploy a production-style T-Pot honeypot instance, validate it’s collecting telemetry, and demonstrate basic analyst workflows: access the Kibana web UI, filter events (by IP/port/service), extract IOCs (IPs, usernames, passwords).</description>
     </item>
     <item>
       <title>Whoami</title>

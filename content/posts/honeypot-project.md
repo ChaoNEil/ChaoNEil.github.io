@@ -11,7 +11,7 @@ A Honeypot is a decoy system or network resource designed to attract, detect, an
 
 ## **Project objective**  
 
-Deploy a production-style T-Pot honeypot instance, validate it’s collecting telemetry, and demonstrate basic analyst workflows: access the Kibana web UI, filter events (by IP/port/service), extract IOCs (IPs, usernames, passwords), and capture a short write-up showing one example incident (timeline + pcap or Sysmon/Suricata evidence).
+Deploy a production-style T-Pot honeypot instance, validate it’s collecting telemetry, and demonstrate basic analyst workflows: access the Kibana web UI, filter events (by IP/port/service), extract IOCs (IPs, usernames, passwords).
 
 **Required tools & prerequisites**
 

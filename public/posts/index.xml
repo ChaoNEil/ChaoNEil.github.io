@@ -1178,11 +1178,11 @@ Also many of things that I did here like RDP from <code>anywhere</code> , is onl
             
             <guid>http://localhost:1313/posts/honeypot-project/</guid>
             <description>What is a honeypot? A Honeypot is a decoy system or network resource designed to attract, detect, and study cyberattacks by mimicking a legitimate and valuable target.It serves as a trap for attackers, luring them into a controlled environment where security professionals can observe and gather intel.
-Project objective Deploy a production-style T-Pot honeypot instance, validate it’s collecting telemetry, and demonstrate basic analyst workflows: access the Kibana web UI, filter events (by IP/port/service), extract IOCs (IPs, usernames, passwords), and capture a short write-up showing one example incident (timeline + pcap or Sysmon/Suricata evidence).</description>
+Project objective Deploy a production-style T-Pot honeypot instance, validate it’s collecting telemetry, and demonstrate basic analyst workflows: access the Kibana web UI, filter events (by IP/port/service), extract IOCs (IPs, usernames, passwords).</description>
             <content type="html"><![CDATA[<h2 id="what-is-a-honeypot">What is a honeypot?</h2>
 <p>A Honeypot is a decoy system or network resource designed to attract, detect, and study cyberattacks by mimicking a legitimate and valuable target.It serves as a trap for attackers, luring them into a controlled environment where security professionals can observe and gather intel.</p>
 <h2 id="project-objective"><strong>Project objective</strong></h2>
-<p>Deploy a production-style T-Pot honeypot instance, validate it’s collecting telemetry, and demonstrate basic analyst workflows: access the Kibana web UI, filter events (by IP/port/service), extract IOCs (IPs, usernames, passwords), and capture a short write-up showing one example incident (timeline + pcap or Sysmon/Suricata evidence).</p>
+<p>Deploy a production-style T-Pot honeypot instance, validate it’s collecting telemetry, and demonstrate basic analyst workflows: access the Kibana web UI, filter events (by IP/port/service), extract IOCs (IPs, usernames, passwords).</p>
 <p><strong>Required tools &amp; prerequisites</strong></p>
 <ul>
 <li>
