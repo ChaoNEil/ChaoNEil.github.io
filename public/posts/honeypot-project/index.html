@@ -1,0 +1,524 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script>
+        <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="ie=edge">
+
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="author" content="">
+<meta name="description" content="What is a honeypot? A Honeypot is a decoy system or network resource designed to attract, detect, and study cyberattacks by mimicking a legitimate and valuable target.It serves as a trap for attackers, luring them into a controlled environment where security professionals can observe and gather intel.
+Project objective Deploy a production-style T-Pot honeypot instance, validate it’s collecting telemetry, and demonstrate basic analyst workflows: access the Kibana web UI, filter events (by IP/port/service), extract IOCs (IPs, usernames, passwords), and capture a short write-up showing one example incident (timeline &#43; pcap or Sysmon/Suricata evidence)." />
+<meta name="keywords" content="homepage, blog" />
+<meta name="robots" content="noodp" />
+<meta name="theme-color" content="" />
+<link rel="canonical" href="http://localhost:1313/posts/honeypot-project/" />
+
+
+    <title>
+        
+            T-Pot Honeypot Setup and Attack Monitoring :: ChaoNEil 
+        
+    </title>
+
+
+
+
+
+  <link rel="stylesheet" href="/main.min.ab5336003ba331300318b49292c672210905baf1ef5410a739f647e70c8808fa.css" integrity="sha256-q1M2ADujMTADGLSSksZyIQkFuvHvVBCnOfZH5wyICPo=" crossorigin="anonymous">
+
+
+
+
+
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+    <link rel="manifest" href="/site.webmanifest">
+    <link rel="mask-icon" href="/safari-pinned-tab.svg" color="">
+    <link rel="shortcut icon" href="/favicon.ico">
+    <meta name="msapplication-TileColor" content="">
+
+
+
+  <meta itemprop="name" content="T-Pot Honeypot Setup and Attack Monitoring">
+  <meta itemprop="description" content="What is a honeypot? A Honeypot is a decoy system or network resource designed to attract, detect, and study cyberattacks by mimicking a legitimate and valuable target.It serves as a trap for attackers, luring them into a controlled environment where security professionals can observe and gather intel.
+Project objective Deploy a production-style T-Pot honeypot instance, validate it’s collecting telemetry, and demonstrate basic analyst workflows: access the Kibana web UI, filter events (by IP/port/service), extract IOCs (IPs, usernames, passwords), and capture a short write-up showing one example incident (timeline &#43; pcap or Sysmon/Suricata evidence).">
+  <meta itemprop="wordCount" content="1127">
+  <meta itemprop="image" content="http://localhost:1313/">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="http://localhost:1313/"><meta name="twitter:title" content="T-Pot Honeypot Setup and Attack Monitoring">
+<meta name="twitter:description" content="What is a honeypot? A Honeypot is a decoy system or network resource designed to attract, detect, and study cyberattacks by mimicking a legitimate and valuable target.It serves as a trap for attackers, luring them into a controlled environment where security professionals can observe and gather intel.
+Project objective Deploy a production-style T-Pot honeypot instance, validate it’s collecting telemetry, and demonstrate basic analyst workflows: access the Kibana web UI, filter events (by IP/port/service), extract IOCs (IPs, usernames, passwords), and capture a short write-up showing one example incident (timeline &#43; pcap or Sysmon/Suricata evidence).">
+
+
+
+    <meta property="og:url" content="http://localhost:1313/posts/honeypot-project/">
+  <meta property="og:site_name" content="ChaoNEil">
+  <meta property="og:title" content="T-Pot Honeypot Setup and Attack Monitoring">
+  <meta property="og:description" content="What is a honeypot? A Honeypot is a decoy system or network resource designed to attract, detect, and study cyberattacks by mimicking a legitimate and valuable target.It serves as a trap for attackers, luring them into a controlled environment where security professionals can observe and gather intel.
+Project objective Deploy a production-style T-Pot honeypot instance, validate it’s collecting telemetry, and demonstrate basic analyst workflows: access the Kibana web UI, filter events (by IP/port/service), extract IOCs (IPs, usernames, passwords), and capture a short write-up showing one example incident (timeline &#43; pcap or Sysmon/Suricata evidence).">
+  <meta property="og:locale" content="en">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="posts">
+    <meta property="og:image" content="http://localhost:1313/">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    </head>
+
+    
+        <body>
+    
+    
+        <div class="container">
+            <header class="header">
+    <span class="header__inner">
+        <a href="/" style="text-decoration: none;">
+    <div class="logo">
+        
+            <span class="logo__mark">></span>
+            <span class="logo__text ">
+                hello friend..</span>
+            <span class="logo__cursor" style=
+                  "
+                   
+                   ">
+            </span>
+        
+    </div>
+</a>
+
+
+        <span class="header__right">
+                <nav class="menu">
+    <ul class="menu__inner"><li><a href="/posts">Blog</a></li><li><a href="/whoami/">Whoami</a></li>
+    </ul>
+</nav>
+
+                <span class="menu-trigger">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                        <path d="M0 0h24v24H0z" fill="none"/>
+                        <path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"/>
+                    </svg>
+                </span>
+        </span>
+    </span>
+</header>
+
+
+            <div class="content">
+                
+  <main class="post">
+
+    <div class="post-info">
+      <p>
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-clock">
+          <circle cx="12" cy="12" r="10"></circle>
+          <polyline points="12 6 12 12 16 14"></polyline>
+        </svg>
+        6 minutes
+
+        
+      </p>
+    </div>
+
+    <article>
+      <h1 class="post-title">
+        <a href="http://localhost:1313/posts/honeypot-project/">T-Pot Honeypot Setup and Attack Monitoring</a>
+      </h1>
+
+      
+
+      
+
+      
+
+      <div class="post-content">
+        <h2 id="what-is-a-honeypot">What is a honeypot?</h2>
+<p>A Honeypot is a decoy system or network resource designed to attract, detect, and study cyberattacks by mimicking a legitimate and valuable target.It serves as a trap for attackers, luring them into a controlled environment where security professionals can observe and gather intel.</p>
+<h2 id="project-objective"><strong>Project objective</strong></h2>
+<p>Deploy a production-style T-Pot honeypot instance, validate it’s collecting telemetry, and demonstrate basic analyst workflows: access the Kibana web UI, filter events (by IP/port/service), extract IOCs (IPs, usernames, passwords), and capture a short write-up showing one example incident (timeline + pcap or Sysmon/Suricata evidence).</p>
+<p><strong>Required tools &amp; prerequisites</strong></p>
+<ul>
+<li>
+<p><strong>Account &amp; host</strong></p>
+<ul>
+<li>
+<p>Cloud VM or dedicated host with virtualization</p>
+</li>
+<li>
+<p>Minimum footprint: <strong>8 GB RAM, 4 vCPU, 80 GB disk</strong> (use larger if you plan extended capture).</p>
+</li>
+<li>
+<p>Public IPv4 address (for honeypot visibility). Optional: DNS name that looks legitimate.</p>
+</li>
+</ul>
+</li>
+<li>
+<p><strong>Access &amp; permissions</strong></p>
+<ul>
+<li>
+<p>Root or sudo admin account on the VM. Ability to open/forward TCP ports and reboot the instance.</p>
+</li>
+<li>
+<p>Credit card or cloud credits if using public cloud (DigitalOcean, Vultr, AWS).</p>
+</li>
+</ul>
+</li>
+<li>
+<p><strong>Network &amp; security</strong></p>
+<ul>
+<li>
+<p>Isolated environment policy: do not run on a host that can access your production network. Use host-only or strictly firewalled environment if local.</p>
+</li>
+<li>
+<p>Host firewall rules and ability to open the T-Pot web ports (default installer changes SSH port and exposes Kibana/ELK UI).</p>
+</li>
+<li>
+<p>Optional: a jump host or bastion for secure admin access.</p>
+</li>
+</ul>
+</li>
+<li>
+<p><strong>Software &amp; dependencies</strong></p>
+<ul>
+<li>
+<p><code>git</code>, <code>curl</code>, <code>wget</code>, <code>unzip</code> installed on the VM.</p>
+</li>
+<li>
+<p>Docker &amp; Docker Compose (T-Pot installer will handle most requirements but ensure the host supports Docker).</p>
+</li>
+<li>
+<p>Ability to install and run <code>systemd</code> services (standard on Ubuntu).</p>
+</li>
+</ul>
+</li>
+<li>
+<p><strong>Operational</strong></p>
+<ul>
+<li>
+<p>Snapshot capability (create VM snapshot before install and before running samples).</p>
+</li>
+<li>
+<p>Time to complete: ~30–90 minutes for installation on a sufficiently provisioned VM; longer if networking/tuning required.</p>
+</li>
+<li>
+<p>Budget note: cloud hourly/monthly costs apply; install may require a reboot and short downtime.</p>
+</li>
+</ul>
+</li>
+<li>
+<p><strong>Safety &amp; policy</strong></p>
+<ul>
+<li>
+<p>Understand legal/ethical constraints: honeypots attract malicious traffic — do not use them to proxy traffic to other networks, do not host third-party content, and ensure you have the right to expose the VM on the public Internet.</p>
+</li>
+<li>
+<p>Logging retention and disk consumption planning (ELK can grow quickly).</p>
+</li>
+</ul>
+</li>
+</ul>
+<p>&ndash;</p>
+<p>You can either make either make this on your virtual machine, or cloud. For cloud choose any platform(<code>DigitalOcean, Vultr</code>, etc) and make an account. You will usually get free credits for some months or so. Use them to complete this project.</p>
+<p>For now , I will use a cloud platform called DigitalOcean.
+Use this link to get a free $200 credit , should be more than enough for this project.</p>
+<p><code>https://www.digitalocean.com/?refcode=e2ce5a05f701&amp;utm_campaign=Referral_Invite&amp;utm_medium=Referral_Program&amp;utm_source=CopyPaste</code></p>
+<p>To activate this credit, you must link a valid credit card.</p>
+<p><em><strong>Note</strong></em>: <code>If you opted for the cloud option, don't forget set the hostname name as legit as possible. Eg: WBC-Web-Server2</code>.</p>
+<hr>
+<h1 id="creating-our-cloud-vm">Creating our Cloud VM</h1>
+<p>After creating an account, navigate to &ldquo;Create &mdash;&gt; Droplets&rdquo;. Now select these things:</p>
+<ul>
+<li>A datacenter close to your home</li>
+<li>Ubuntu version <code>24.04 (LTS) x64</code></li>
+<li>Regular Disk type SSD</li>
+<li>$48/mo (8 gb/4 CPU) plan  &mdash;- <code>might change in the future</code></li>
+<li>Use Password authentication method</li>
+<li>Hostname must sound legit <code>WBC-Web-Server2</code></li>
+</ul>
+<p><img src="/images/honeypot-project/1.png"></p>
+<p>Click on your droplet and you will find additional information regarding that VM.</p>
+<p><img src="/images/honeypot-project/2.png"></p>
+<p>It is important to configure a firewall so that only you and your associated IPs can connect to this machine but since this a <strong>Honeypot</strong>, you want it to be able to be accessible from anywhere.</p>
+<hr>
+<h1 id="accessing-the-vm-and-creating-user">Accessing the VM and Creating User</h1>
+<p>To access the VM, you can already see the public IPv4 address in the above screenshot. Copy it and open powershell and login via SSH:</p>
+<p><img src="/images/honeypot-project/3.png"></p>
+<p>Update the drivers to avoid future errors. Press &ldquo;enter&rdquo; if prompt to do so.</p>
+<p><img src="/images/honeypot-project/4.png"></p>
+<p>Once this is done, you must also create a new user. Only one user exist at the moment which is the <code>Root</code>user and it is not best practice to run commands or use the vm with root account.</p>
+<h5 id="user-creation">User creation:</h5>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>adduser bill   <span style="color:#f92672">(</span>you can use whatever name you want<span style="color:#f92672">)</span>
+</span></span></code></pre></div><p>Leave other details of bill as empty.</p>
+<p>Also add <code>bill</code>to the sudo group.
+<code>A sudo group is **a group of superusers that have privileged access to root commands**</code></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-Shell" data-lang="Shell"><span style="display:flex;"><span>sudo usermod -aG sudo bill
+</span></span></code></pre></div><p><code>bill</code> will now have admin privileges.</p>
+<p>Finally, switch user to <code>bill</code> by using this command:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>su bill
+</span></span></code></pre></div><p><img src="/images/honeypot-project/5.png"></p>
+<hr>
+<h1 id="installing-t-pot-honeypot">Installing T-Pot HoneyPot</h1>
+<p>Clone this github repo :</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>git clone https://github.com/telekom-security/tpotce
+</span></span></code></pre></div><p>Change directories to <code>tpotce</code> and run the install script and follow the onscreen instructions:</p>
+<p><img src="/images/honeypot-project/6.png"></p>
+<p>Keep in mind that this installation will change your ssh port to <em>64295</em>, shown in the output. That means to log back in with ssh , you mush specify this port</p>
+<p><code>ssh bill@&lt;ipaddr&gt; -p 64295</code></p>
+<p><img src="/images/honeypot-project/7.png"></p>
+<p>After some time this will pop up, select the first option:</p>
+<p><img src="/images/honeypot-project/8.png"></p>
+<p>Type <code>bill</code> as the web-user or whatever name you chose.</p>
+<p>This process might take some time , and might also fail if you chose a VM with low ram during the installation. If that happens, select <code>M</code> for mini T-pot installation.</p>
+<p><img src="/images/honeypot-project/9.png">
+<code>sudo reboot</code></p>
+<p>Wait a few mins before reconnecting.</p>
+<p><code>ssh root@139.59.70.190 -p 64295</code></p>
+<p>After re-logging in , you can view the status of the <code>tpot</code> service running by running this command :</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>systemctl status tpot
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>systemctl restart tpot  <span style="color:#f92672">(</span> <span style="color:#66d9ef">if</span> you have trouble viewing the webUI <span style="color:#f92672">)</span>
+</span></span></code></pre></div><hr>
+<h1 id="t-pot-honeypot-webui">T-Pot Honeypot WebUI</h1>
+<p>After everything is complete , you can view the webUI with this port :</p>
+<p><code>https://&lt;your.ip&gt;:64297</code></p>
+<p>It will throw us on a landing page where you can view the attack map. There are other options as well.</p>
+<p><img src="/images/honeypot-project/10.png"></p>
+<p>Select the <code>&quot;kibana&quot;</code> option from the landing page and you will be presented with a dashboard in Elastic SIEM. You can filter it by IPs , ports , services attacked, passwords used to brute force, users attacked, etc. Play</p>
+<p><img src="/images/honeypot-project/11.png"></p>
+<p>There are hundreds of attacks and scans already happening and If you check back the map after a hour or so , you will see a lot more action.</p>
+<p>I encourage you to play around with it and have fun, its pretty cool.</p>
+<hr>
+<h1 id="closing-summary"><strong>Closing summary</strong>:</h1>
+<h3 id="skills-learned--concepts-reinforced">Skills learned &amp; concepts reinforced</h3>
+<ul>
+<li>
+<p><strong>Infrastructure provisioning &amp; hardening</strong></p>
+<ul>
+<li>Creating and configuring a cloud VM, non-root user creation, minimal privilege management, and snapshot-based recovery workflows.</li>
+</ul>
+</li>
+<li>
+<p><strong>Service deployment &amp; package orchestration</strong></p>
+<ul>
+<li>Using <code>git</code> and the T-Pot installer, understanding Docker/compose orchestration, recognizing common install failures and resource constraints, and managing services with <code>systemctl</code>.</li>
+</ul>
+</li>
+<li>
+<p><strong>Honeypot concepts and telemetry collection</strong></p>
+<ul>
+<li>Why honeypots are used (intelligence, early detection, signature generation), and how multiple sensors (Telnet/SSH/HTTP/Elastic/Suricata/ConPot/etc.) are combined to create high-fidelity telemetry.</li>
+</ul>
+</li>
+<li>
+<p><strong>Log analysis and triage</strong></p>
+<ul>
+<li>Accessing Kibana dashboards, filtering by IP/port/service/time, extracting IOCs (IPs, usernames, passwords, URI paths), and correlating events across network (pcap) and host logs.</li>
+</ul>
+</li>
+<li>
+<p><strong>Detection &amp; operationalization</strong></p>
+<ul>
+<li>Producing actionable outputs: IOCs for firewall/IDS, Suricata/Zeek/IDS rules, and initial remediation advice (block lists, network segmentation, rate limiting).</li>
+</ul>
+</li>
+<li>
+<p><strong>Practical operational skills</strong></p>
+<ul>
+<li>Safe handling of live malicious traffic (isolation, snapshot recovery), resource planning for logging, and documenting evidence for reproducible analysis.</li>
+</ul>
+</li>
+</ul>
+
+      </div>
+    </article>
+
+    <hr />
+
+    <div class="post-info">
+      
+      
+
+      <p>
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-file-text">
+          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+          <polyline points="14 2 14 8 20 8"></polyline>
+          <line x1="16" y1="13" x2="8" y2="13"></line>
+          <line x1="16" y1="17" x2="8" y2="17"></line>
+          <polyline points="10 9 9 9 8 9"></polyline>
+        </svg>
+        1127 Words
+      </p>
+
+      <p>
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-calendar">
+          <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+          <line x1="16" y1="2" x2="16" y2="6"></line>
+          <line x1="8" y1="2" x2="8" y2="6"></line>
+          <line x1="3" y1="10" x2="21" y2="10"></line>
+        </svg>
+        
+          0001-01-01 05:30
+        
+
+        
+      </p>
+    </div>
+      <hr />
+      <div class="sharing-buttons">
+        
+<a class="resp-sharing-button__link" href="https://facebook.com/sharer/sharer.php?u=http%3a%2f%2flocalhost%3a1313%2fposts%2fhoneypot-project%2f" target="_blank" rel="noopener" aria-label="" title="Share on facebook">
+  <div class="resp-sharing-button resp-sharing-button--facebook resp-sharing-button--small"><div aria-hidden="true" class="resp-sharing-button__icon resp-sharing-button__icon--solid">
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"></path></svg>
+    </div>
+  </div>
+</a>
+
+
+<a class="resp-sharing-button__link" href="https://twitter.com/intent/tweet/?url=http%3a%2f%2flocalhost%3a1313%2fposts%2fhoneypot-project%2f" target="_blank" rel="noopener" aria-label="" title="Share on twitter">
+  <div class="resp-sharing-button resp-sharing-button--twitter resp-sharing-button--small">
+      <div aria-hidden="true" class="resp-sharing-button__icon resp-sharing-button__icon--solid">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 3a10.9 10.9 0 0 1-3.14 1.53 4.48 4.48 0 0 0-7.86 3v1A10.66 10.66 0 0 1 3 4s-4 9 5 13a11.64 11.64 0 0 1-7 2c9 5 20 0 20-11.5a4.5 4.5 0 0 0-.08-.83A7.72 7.72 0 0 0 23 3z"></path></svg>
+    </div>
+  </div>
+</a>
+
+
+<a class="resp-sharing-button__link" href="https://www.tumblr.com/widgets/share/tool?posttype=link&amp;title=T-Pot%20Honeypot%20Setup%20and%20Attack%20Monitoring&amp;caption=T-Pot%20Honeypot%20Setup%20and%20Attack%20Monitoring&amp;canonicalUrl=http%3a%2f%2flocalhost%3a1313%2fposts%2fhoneypot-project%2f" target="_blank" rel="noopener" aria-label="" title="Share on tumblr">
+  <div class="resp-sharing-button resp-sharing-button--tumblr resp-sharing-button--small">
+    <div aria-hidden="true" class="resp-sharing-button__icon resp-sharing-button__icon--solid">
+      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor" stroke="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.563 24c-5.093 0-7.031-3.756-7.031-6.411V9.747H5.116V6.648c3.63-1.313 4.512-4.596 4.71-6.469C9.84.051 9.941 0 9.999 0h3.517v6.114h4.801v3.633h-4.82v7.47c.016 1.001.375 2.371 2.207 2.371h.09c.631-.02 1.486-.205 1.936-.419l1.156 3.425c-.436.636-2.4 1.374-4.156 1.404h-.178l.011.002z"/></svg>
+    </div>
+  </div>
+</a>
+
+
+<a class="resp-sharing-button__link" href="mailto:?subject=T-Pot%20Honeypot%20Setup%20and%20Attack%20Monitoring&amp;body=http%3a%2f%2flocalhost%3a1313%2fposts%2fhoneypot-project%2f" target="_self" rel="noopener" aria-label="" title="Share via email">
+  <div class="resp-sharing-button resp-sharing-button--email resp-sharing-button--small"><div aria-hidden="true" class="resp-sharing-button__icon resp-sharing-button__icon--solid">
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
+    </div>
+  </div>
+</a>
+
+
+<a class="resp-sharing-button__link" href="https://pinterest.com/pin/create/button/?url=http%3a%2f%2flocalhost%3a1313%2fposts%2fhoneypot-project%2f&amp;media=http%3a%2f%2flocalhost%3a1313%2fposts%2fhoneypot-project%2f;description=T-Pot%20Honeypot%20Setup%20and%20Attack%20Monitoring" target="_blank" rel="noopener" aria-label="" title="Share on pinterest">
+  <div class="resp-sharing-button resp-sharing-button--pinterest resp-sharing-button--small"><div aria-hidden="true" class="resp-sharing-button__icon resp-sharing-button__icon--solid">
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M12.017 0C5.396 0 .029 5.367.029 11.987c0 5.079 3.158 9.417 7.618 11.162-.105-.949-.199-2.403.041-3.439.219-.937 1.406-5.957 1.406-5.957s-.359-.72-.359-1.781c0-1.663.967-2.911 2.168-2.911 1.024 0 1.518.769 1.518 1.688 0 1.029-.653 2.567-.992 3.992-.285 1.193.6 2.165 1.775 2.165 2.128 0 3.768-2.245 3.768-5.487 0-2.861-2.063-4.869-5.008-4.869-3.41 0-5.409 2.562-5.409 5.199 0 1.033.394 2.143.889 2.741.099.12.112.225.085.345-.09.375-.293 1.199-.334 1.363-.053.225-.172.271-.401.165-1.495-.69-2.433-2.878-2.433-4.646 0-3.776 2.748-7.252 7.92-7.252 4.158 0 7.392 2.967 7.392 6.923 0 4.135-2.607 7.462-6.233 7.462-1.214 0-2.354-.629-2.758-1.379l-.749 2.848c-.269 1.045-1.004 2.352-1.498 3.146 1.123.345 2.306.535 3.55.535 6.607 0 11.985-5.365 11.985-11.987C23.97 5.39 18.592.026 11.985.026L12.017 0z"/></svg>
+    </div>
+  </div>
+</a>
+
+
+<a class="resp-sharing-button__link" href="https://www.linkedin.com/shareArticle?mini=true&amp;url=http%3a%2f%2flocalhost%3a1313%2fposts%2fhoneypot-project%2f&amp;title=T-Pot%20Honeypot%20Setup%20and%20Attack%20Monitoring&amp;summary=T-Pot%20Honeypot%20Setup%20and%20Attack%20Monitoring&amp;source=http%3a%2f%2flocalhost%3a1313%2fposts%2fhoneypot-project%2f" target="_blank" rel="noopener" aria-label="" title="Share on linkedin">
+  <div class="resp-sharing-button resp-sharing-button--linkedin resp-sharing-button--small"><div aria-hidden="true" class="resp-sharing-button__icon resp-sharing-button__icon--solid">
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"></path><rect x="2" y="9" width="4" height="12"></rect><circle cx="4" cy="4" r="2"></circle></svg>
+    </div>
+  </div>
+</a>
+
+
+<a class="resp-sharing-button__link" href="https://reddit.com/submit/?url=http%3a%2f%2flocalhost%3a1313%2fposts%2fhoneypot-project%2f&amp;resubmit=true&amp;title=T-Pot%20Honeypot%20Setup%20and%20Attack%20Monitoring" target="_blank" rel="noopener" aria-label="" title="Share on reddit">
+  <div class="resp-sharing-button resp-sharing-button--reddit resp-sharing-button--small"><div aria-hidden="true" class="resp-sharing-button__icon resp-sharing-button__icon--solid">
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M12 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0zm5.01 4.744c.688 0 1.25.561 1.25 1.249a1.25 1.25 0 0 1-2.498.056l-2.597-.547-.8 3.747c1.824.07 3.48.632 4.674 1.488.308-.309.73-.491 1.207-.491.968 0 1.754.786 1.754 1.754 0 .716-.435 1.333-1.01 1.614a3.111 3.111 0 0 1 .042.52c0 2.694-3.13 4.87-7.004 4.87-3.874 0-7.004-2.176-7.004-4.87 0-.183.015-.366.043-.534A1.748 1.748 0 0 1 4.028 12c0-.968.786-1.754 1.754-1.754.463 0 .898.196 1.207.49 1.207-.883 2.878-1.43 4.744-1.487l.885-4.182a.342.342 0 0 1 .14-.197.35.35 0 0 1 .238-.042l2.906.617a1.214 1.214 0 0 1 1.108-.701zM9.25 12C8.561 12 8 12.562 8 13.25c0 .687.561 1.248 1.25 1.248.687 0 1.248-.561 1.248-1.249 0-.688-.561-1.249-1.249-1.249zm5.5 0c-.687 0-1.248.561-1.248 1.25 0 .687.561 1.248 1.249 1.248.688 0 1.249-.561 1.249-1.249 0-.687-.562-1.249-1.25-1.249zm-5.466 3.99a.327.327 0 0 0-.231.094.33.33 0 0 0 0 .463c.842.842 2.484.913 2.961.913.477 0 2.105-.056 2.961-.913a.361.361 0 0 0 .029-.463.33.33 0 0 0-.464 0c-.547.533-1.684.73-2.512.73-.828 0-1.979-.196-2.512-.73a.326.326 0 0 0-.232-.095z"/></svg>
+    </div>
+  </div>
+</a>
+
+
+<a class="resp-sharing-button__link" href="https://www.xing.com/app/user?op=share;url=http%3a%2f%2flocalhost%3a1313%2fposts%2fhoneypot-project%2f;title=T-Pot%20Honeypot%20Setup%20and%20Attack%20Monitoring" target="_blank" rel="noopener" aria-label="" title="Share on xing">
+  <div class="resp-sharing-button resp-sharing-button--xing resp-sharing-button--small"><div aria-hidden="true" class="resp-sharing-button__icon resp-sharing-button__icon--solid">
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M18.188 0c-.517 0-.741.325-.927.66 0 0-7.455 13.224-7.702 13.657.015.024 4.919 9.023 4.919 9.023.17.308.436.66.967.66h3.454c.211 0 .375-.078.463-.22.089-.151.089-.346-.009-.536l-4.879-8.916c-.004-.006-.004-.016 0-.022L22.139.756c.095-.191.097-.387.006-.535C22.056.078 21.894 0 21.686 0h-3.498zM3.648 4.74c-.211 0-.385.074-.473.216-.09.149-.078.339.02.531l2.34 4.05c.004.01.004.016 0 .021L1.86 16.051c-.099.188-.093.381 0 .529.085.142.239.234.45.234h3.461c.518 0 .766-.348.945-.667l3.734-6.609-2.378-4.155c-.172-.315-.434-.659-.962-.659H3.648v.016z"/></svg>
+    </div>
+  </div>
+</a>
+
+
+<a class="resp-sharing-button__link" href="whatsapp://send?text=T-Pot%20Honeypot%20Setup%20and%20Attack%20Monitoring%20http%3a%2f%2flocalhost%3a1313%2fposts%2fhoneypot-project%2f" target="_blank" rel="noopener" aria-label="" title="Share on whatsapp">
+  <div class="resp-sharing-button resp-sharing-button--whatsapp resp-sharing-button--small"><div aria-hidden="true" class="resp-sharing-button__icon resp-sharing-button__icon--solid">
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor" stroke="none" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg>
+    </div>
+  </div>
+</a>
+
+
+<a class="resp-sharing-button__link" href="https://news.ycombinator.com/submitlink?u=http%3a%2f%2flocalhost%3a1313%2fposts%2fhoneypot-project%2f&amp;t=T-Pot%20Honeypot%20Setup%20and%20Attack%20Monitoring" target="_blank" rel="noopener" aria-label="" title="Share on hacker news">
+  <div class="resp-sharing-button resp-sharing-button--hackernews resp-sharing-button--small"><div aria-hidden="true" class="resp-sharing-button__icon resp-sharing-button__icon--solid">
+			<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M0 24V0h24v24H0zM6.951 5.896l4.112 7.708v5.064h1.583v-4.972l4.148-7.799h-1.749l-2.457 4.875c-.372.745-.688 1.434-.688 1.434s-.297-.708-.651-1.434L8.831 5.896h-1.88z"/></svg>
+    </div>
+  </div>
+</a>
+
+
+<a class="resp-sharing-button__link" href="https://telegram.me/share/url?text=T-Pot%20Honeypot%20Setup%20and%20Attack%20Monitoring&amp;url=http%3a%2f%2flocalhost%3a1313%2fposts%2fhoneypot-project%2f" target="_blank" rel="noopener" aria-label="" title="Share on telegram">
+  <div class="resp-sharing-button resp-sharing-button--telegram resp-sharing-button--small"><div aria-hidden="true" class="resp-sharing-button__icon resp-sharing-button__icon--solid">
+      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+    </div>
+  </div>
+</a>
+
+      </div>
+
+    
+    <div class="pagination">
+        
+
+        <div class="pagination__buttons">
+            
+            <span class="button previous">
+                <a href="http://localhost:1313/posts/soc-lab/">
+                    <span class="button__icon">←</span>
+                    <span class="button__text">SOC Active Directory Cloud Project (Splunk, Shuffle and Slack)</span>
+                </a>
+            </span>
+            
+
+            
+        </div>
+    </div>
+
+
+    
+
+    
+
+    
+
+  </main>
+
+            </div>
+
+            
+                <footer class="footer">
+    
+    
+</footer>
+
+            
+        </div>
+
+        
+
+
+
+<script type="text/javascript" src="/bundle.min.85fad2de4f13fec3bcb3b3cb10430cdb44a7b4a9749b32938241a5c6e77718df7624f1002b880521fdc26e24ec1077fda214bf1cb36ee3045510760d09638cae.js" integrity="sha512-hfrS3k8T/sO8s7PLEEMM20SntKl0mzKTgkGlxud3GN92JPEAK4gFIf3CbiTsEHf9ohS/HLNu4wRVEHYNCWOMrg=="></script>
+
+
+
+
+    </body>
+</html>

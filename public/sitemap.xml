@@ -11,6 +11,8 @@
     <loc>http://localhost:1313/posts/</loc>
     <lastmod>2024-02-01T11:45:00+05:30</lastmod>
   </url><url>
+    <loc>http://localhost:1313/posts/honeypot-project/</loc>
+  </url><url>
     <loc>http://localhost:1313/blog/</loc>
   </url><url>
     <loc>http://localhost:1313/posts/first-blog/</loc>
@@ -28,6 +30,8 @@
     <loc>http://localhost:1313/posts/reverse-engineer-fundamentals/</loc>
   </url><url>
     <loc>http://localhost:1313/series/</loc>
+  </url><url>
+    <loc>http://localhost:1313/posts/soc-lab2/</loc>
   </url><url>
     <loc>http://localhost:1313/posts/soc-lab/</loc>
   </url><url>

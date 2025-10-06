@@ -1035,7 +1035,7 @@ CompanyX-Splunk ip 10.51.96.5  private
 <p>The public and private VPC IPs are all mentioned above.</p>
 <p>I have also set up firewall rules so that only I (from my local machine) with my public IP address, can access these machines on the cloud.</p>
 <p><img src="/images/soc-lab-project/1-edited.png"></p>
-<p>At this point in time, i can ping all of my 3 machines:</p>
+<p>At this point in time, I can ping all of my 3 machines:</p>
 <p><img src="/images/soc-lab-project/2.png"></p>
 <hr>
 <h2 id="configuring-active-directory">Configuring Active Directory</h2>
@@ -1046,7 +1046,7 @@ Password : <code>[Redacted]</code></p>
 <p>Added a user <code>Jenny Smith</code>
 Password: <code>[Redacted]</code></p>
 <p><img src="/images/soc-lab-project/3.png"></p>
-<p>Now that i have created AD and DC server and a user, i will join the windows test machine to this Domain and authenticate it to the server using <code>jenny smith</code> user.</p>
+<p>Now that I have created AD and DC server and a user, I will join the windows test machine to this Domain and authenticate it to the server using <code>jenny smith</code> user.</p>
 <p>In the process of joining test-machine to the domain server, this error occurred :</p>
 <p><img src="/images/soc-lab-project/4.png"></p>
 <p>Googling this tells me that it usually happens when there is something wrong with DNS resolution. Maybe <code>COMPANYX</code> was not able to resolve to a IP address?</p>
@@ -1058,12 +1058,12 @@ Password: <code>[Redacted]</code></p>
 <p><img src="/images/soc-lab-project/7.png">
 <code>COMPANYX\</code> is needed because it signifies the domain of that user.</p>
 <p><img src="/images/soc-lab-project/8.png"></p>
-<p>After entering the creds, i encountered this error. Remote login is disabled.
+<p>After entering the creds, I encountered this error. Remote login is disabled.
 To enable it, i accessed this test-machine from my vultr dashboard and allowed remote connections
 <img src="/images/soc-lab-project/9.png"></p>
 <p>Added user <code>JSmith</code> to remote desktop users.</p>
 <p><img src="/images/soc-lab-project/10.png"></p>
-<p>Now i can RDP into test-machine normally as <code>JSmith</code>.</p>
+<p>Now I can RDP into test-machine normally as <code>JSmith</code>.</p>
 <p><img src="/images/soc-lab-project/11.png"></p>
 <hr>
 <h2 id="installing-and-configuring-splunk">Installing and Configuring SPLUNK</h2>
@@ -1071,7 +1071,7 @@ To enable it, i accessed this test-machine from my vultr dashboard and allowed r
 <p>Installed splunk free trial:</p>
 <pre tabindex="0"><code>splunk username : [Redacted]
 splunk password : [Redacted]
-</code></pre><p>However to get it running on my host laptop, i had to first:</p>
+</code></pre><p>However to get it running on my host laptop, I had to first:</p>
 <ol>
 <li>add my public IP address in vultr cloud platform for splunk</li>
 </ol>
@@ -1084,7 +1084,7 @@ splunk password : [Redacted]
 <p>I went to splunk indexes to set up my AD index.</p>
 <p><code>Splunk indexes are a repository of data stored in a structured and searchable format after being processed and transformed into events</code>
 ~Google</p>
-<p>To receive data from other machines, i set up a port 9997 which is the default.</p>
+<p>To receive data from other machines, I set up a port 9997 which is the default.</p>
 <p><code>Forwarding and receiving &gt;&gt; Reveive data &gt;&gt; set port</code></p>
 <p>Also to be able to forward data , we must install splunk universal forwarder on target machines which in my case , my target machine is the <code>test-machine</code> that has the <code>JSmith</code> user.</p>
 <p>I RDPed into test machine and installed the splunk forwarder. Edited the <code>inputs.conf</code> file to include security logs from event viewer and Restarted the <code>splunk services</code> all as ADMIN.</p>
@@ -1092,8 +1092,8 @@ splunk password : [Redacted]
 <img src="/images/soc-lab-project/14.png"></p>
 <p>Again i had to <code>ufw allow 9997</code> to allow telemetry to flow to our host laptop.</p>
 <p><img src="/images/soc-lab-project/15.png"></p>
-<p>And after doing all that , i had data finally.</p>
-<p>Now i had to do all that again for my Domain controller machine.</p>
+<p>And after doing all that , I had data finally.</p>
+<p>Now I had to do all that again for my Domain controller machine.</p>
 <p>End result:</p>
 <p><img src="/images/soc-lab-project/16.png"></p>
 <p>I have both windows endpoints now configured and are sending data.</p>
@@ -1103,16 +1103,17 @@ splunk password : [Redacted]
 (Example Scenario)</p>
 <p>My public IP starts with <code>49.*</code> , hypothetically lets say, if an authentication comes from any other IP other than that , then it will trigger an alert .</p>
 <p><img src="/images/soc-lab-project/17.png"></p>
-<p>This is the query that i created in splunk :</p>
+<p>This is the query that I created in splunk :</p>
 <div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-C" data-lang="C"><span style="display:flex;"><span>index<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;companyx-ad&#34;</span> EventCode<span style="color:#f92672">=</span><span style="color:#ae81ff">4624</span> (Logon_Type<span style="color:#f92672">=</span><span style="color:#ae81ff">7</span> OR Logon_Type<span style="color:#f92672">=</span><span style="color:#ae81ff">10</span>) Source_Network_Address<span style="color:#f92672">=*</span> Source_Network_Address<span style="color:#f92672">!=</span><span style="color:#ae81ff">49.</span><span style="color:#f92672">*</span>
 </span></span><span style="display:flex;"><span>
 </span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>Logon Type <span style="color:#ae81ff">7</span> occurs when a user unlocks their machine
-</span></span><span style="display:flex;"><span>Logon Type <span style="color:#ae81ff">10</span> indicates a user logging into a computer remotely
+</span></span><span style="display:flex;"><span>Event Code <span style="color:#ae81ff">4624</span> is <span style="color:#66d9ef">for</span> <span style="color:#e6db74">&#34;Successful Login&#34;</span> and under this event:
+</span></span><span style="display:flex;"><span>	Logon Type <span style="color:#ae81ff">7</span> occurs when a user unlocks their machine
+</span></span><span style="display:flex;"><span>	Logon Type <span style="color:#ae81ff">10</span> indicates a user logging into a computer remotely
 </span></span></code></pre></div><p>I will login from a kali machine with VPN to trigger this alert . I have also set my firewall to accept RDP connections from <code>anywhere</code>.</p>
-<p>Here i got a result back after running above query while earlier it was null.</p>
+<p>Here I got a result back after running above query while earlier it was null.</p>
 <p><img src="/images/soc-lab-project/18.png">
-A successful login from Sweden.</p>
+A successful login was detected from Sweden. To identify the country of origin, I simply pasted the IP address into Google.</p>
 <p>Cleaning up the query a bit more by using <code>stats</code></p>
 <div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span>index<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;companyx-ad&#34;</span> EventCode<span style="color:#f92672">=</span><span style="color:#ae81ff">4624</span> (Logon_Type<span style="color:#f92672">=</span><span style="color:#ae81ff">7</span> OR Logon_Type<span style="color:#f92672">=</span><span style="color:#ae81ff">10</span>) Source_Network_Address<span style="color:#f92672">=*</span> Source_Network_Address<span style="color:#f92672">!=</span><span style="color:#ae81ff">49.</span><span style="color:#f92672">*</span> Source_Network_Address<span style="color:#f92672">!=</span><span style="color:#e6db74">&#34;-&#34;</span>
 </span></span><span style="display:flex;"><span><span style="color:#f92672">|</span> stats count by action, user, ComputerName, _time, Source_Network_Address, Logon_Type
@@ -1130,10 +1131,10 @@ A successful login from Sweden.</p>
 <p>Started the webhook and it generated alerts based on the alert conditions.</p>
 <p>I got an alert from splunk:</p>
 <p><img src="/images/soc-lab-project/22.png"></p>
-<p>The alerting works and now i want it all sent to my slack as a notification so i can get notified to my phone etc, even when i am AFK.</p>
+<p>The alerting works and now I want it all sent to my slack as a notification so I can get notified to my phone etc, even when I am AFK.</p>
 <p>Linked slack and authenticated to receive alerts.</p>
 <p><img src="/images/soc-lab-project/23.png"></p>
-<p>Following up, I clicked the slack block and filled in the values . In the <code>Find Actions</code> field , i selected <code>Chat Postmessage</code> meaning i want the slack alert bot to send me message . In the <code>Text</code> field , i filled up the important parameters that i want to see in an alert like username , time etc.</p>
+<p>Following up, I clicked the slack block and filled in the values . In the <code>Find Actions</code> field , I selected <code>Chat Postmessage</code> meaning I want the slack alert bot to send me message . In the <code>Text</code> field , I filled up the important parameters that I want to see in an alert like username , time etc.</p>
 <p><img src="/images/soc-lab-project/24.png"></p>
 <p>I was stuck for a while on linking and receiving alerts, but I eventually figured it out. It&rsquo;s now sending me alerts. :</p>
 <p><img src="/images/soc-lab-project/25.png"></p>
@@ -1147,8 +1148,8 @@ Use this to convert <code>https://www.epochconverter.com/</code></p>
 <p>We can now for example , include user input. It can work something like <code>&quot;Do you want to disable &lt;username&gt; user?&quot;</code></p>
 <p>The alerts can be emailed to respective SOC analyst&rsquo;s shared email so that all the soc analysts on the shift can see it. There are many options in shuffle like <code>user-input</code> app . There is even a SMS option.</p>
 <p>Shuffle is very versatile so we can drag and drop many different apps and connect/link the nodes to it and make the workflow to our liking.
-For example , lets go beyond this and ask the analyst if <code>he/she wants to disable that particular account</code>. To achieve that , i must connect the <code>user-action</code> app to <code>active directory</code> app. There is a disable user option already in the AD app, i will select that and fill in the required values. I will also allow port 389 in the firewall for AD services.</p>
-<p>After running the workflow in shuffle, i received this alert email:</p>
+For example , lets go beyond this and ask the analyst if <code>he/she wants to disable that particular account</code>. To achieve that , I must connect the <code>user-action</code> app to <code>active directory</code> app. There is a disable user option already in the AD app, I will select that and fill in the required values. I will also allow port 389 in the firewall for AD services.</p>
+<p>After running the workflow in shuffle, I received this alert email:</p>
 <p><img src="/images/soc-lab-project/26.png"></p>
 <p>This email contains yes and no, clicking on yes disables the user and no does nothing.</p>
 <p><img src="/images/soc-lab-project/27.png"></p>
@@ -1161,12 +1162,219 @@ As we can see , the user Jenny has been disabled (indicative by the downward arr
 <p><img src="/images/soc-lab-project/30.png"></p>
 <h5 id="quick-fixes">Quick fixes:</h5>
 <p>I had to create another account with domain admin privileges in order authenticate to AD in shuffle.
-Also many of things that I did here like RDP from <code>anywhere</code> , is only for testing purposes only. Never unnecessary ports to the internet.</p>
+Also many of things that I did here like RDP from <code>anywhere</code> , is only for testing purposes only. Never open unnecessary ports to the internet.</p>
 <hr>
 <h2 id="conclusion">Conclusion</h2>
 <p>This was a great SOC Active Directory lab project as I got to experience many technologies hands on and also got a glimpse of what a real SOC environment may look like. This project helped me understand how real-world SOC environments function by simulating Active Directory attacks and automating alerting using Splunk, Shuffle (SOAR), and Slack. While setting up the workflow in Shuffle, I faced issues with authentication and message formatting but resolving them taught me how important proper configuration and testing are in incident response automation . I also gained practical experience in building detection rules and sending actionable alerts to Slack channels — mimicking how modern security teams stay responsive in real time.</p>
 <p>I have never used tools like Shuffle before so using it in this project was very insightful.</p>
 <p>Overall, this was a valuable hands-on exercise in designing and operating a mini cloud-based SOC.</p>
+]]></content>
+        </item>
+        
+        <item>
+            <title>T-Pot Honeypot Setup and Attack Monitoring</title>
+            <link>http://localhost:1313/posts/honeypot-project/</link>
+            <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+            
+            <guid>http://localhost:1313/posts/honeypot-project/</guid>
+            <description>What is a honeypot? A Honeypot is a decoy system or network resource designed to attract, detect, and study cyberattacks by mimicking a legitimate and valuable target.It serves as a trap for attackers, luring them into a controlled environment where security professionals can observe and gather intel.
+Project objective Deploy a production-style T-Pot honeypot instance, validate it’s collecting telemetry, and demonstrate basic analyst workflows: access the Kibana web UI, filter events (by IP/port/service), extract IOCs (IPs, usernames, passwords), and capture a short write-up showing one example incident (timeline + pcap or Sysmon/Suricata evidence).</description>
+            <content type="html"><![CDATA[<h2 id="what-is-a-honeypot">What is a honeypot?</h2>
+<p>A Honeypot is a decoy system or network resource designed to attract, detect, and study cyberattacks by mimicking a legitimate and valuable target.It serves as a trap for attackers, luring them into a controlled environment where security professionals can observe and gather intel.</p>
+<h2 id="project-objective"><strong>Project objective</strong></h2>
+<p>Deploy a production-style T-Pot honeypot instance, validate it’s collecting telemetry, and demonstrate basic analyst workflows: access the Kibana web UI, filter events (by IP/port/service), extract IOCs (IPs, usernames, passwords), and capture a short write-up showing one example incident (timeline + pcap or Sysmon/Suricata evidence).</p>
+<p><strong>Required tools &amp; prerequisites</strong></p>
+<ul>
+<li>
+<p><strong>Account &amp; host</strong></p>
+<ul>
+<li>
+<p>Cloud VM or dedicated host with virtualization</p>
+</li>
+<li>
+<p>Minimum footprint: <strong>8 GB RAM, 4 vCPU, 80 GB disk</strong> (use larger if you plan extended capture).</p>
+</li>
+<li>
+<p>Public IPv4 address (for honeypot visibility). Optional: DNS name that looks legitimate.</p>
+</li>
+</ul>
+</li>
+<li>
+<p><strong>Access &amp; permissions</strong></p>
+<ul>
+<li>
+<p>Root or sudo admin account on the VM. Ability to open/forward TCP ports and reboot the instance.</p>
+</li>
+<li>
+<p>Credit card or cloud credits if using public cloud (DigitalOcean, Vultr, AWS).</p>
+</li>
+</ul>
+</li>
+<li>
+<p><strong>Network &amp; security</strong></p>
+<ul>
+<li>
+<p>Isolated environment policy: do not run on a host that can access your production network. Use host-only or strictly firewalled environment if local.</p>
+</li>
+<li>
+<p>Host firewall rules and ability to open the T-Pot web ports (default installer changes SSH port and exposes Kibana/ELK UI).</p>
+</li>
+<li>
+<p>Optional: a jump host or bastion for secure admin access.</p>
+</li>
+</ul>
+</li>
+<li>
+<p><strong>Software &amp; dependencies</strong></p>
+<ul>
+<li>
+<p><code>git</code>, <code>curl</code>, <code>wget</code>, <code>unzip</code> installed on the VM.</p>
+</li>
+<li>
+<p>Docker &amp; Docker Compose (T-Pot installer will handle most requirements but ensure the host supports Docker).</p>
+</li>
+<li>
+<p>Ability to install and run <code>systemd</code> services (standard on Ubuntu).</p>
+</li>
+</ul>
+</li>
+<li>
+<p><strong>Operational</strong></p>
+<ul>
+<li>
+<p>Snapshot capability (create VM snapshot before install and before running samples).</p>
+</li>
+<li>
+<p>Time to complete: ~30–90 minutes for installation on a sufficiently provisioned VM; longer if networking/tuning required.</p>
+</li>
+<li>
+<p>Budget note: cloud hourly/monthly costs apply; install may require a reboot and short downtime.</p>
+</li>
+</ul>
+</li>
+<li>
+<p><strong>Safety &amp; policy</strong></p>
+<ul>
+<li>
+<p>Understand legal/ethical constraints: honeypots attract malicious traffic — do not use them to proxy traffic to other networks, do not host third-party content, and ensure you have the right to expose the VM on the public Internet.</p>
+</li>
+<li>
+<p>Logging retention and disk consumption planning (ELK can grow quickly).</p>
+</li>
+</ul>
+</li>
+</ul>
+<p>&ndash;</p>
+<p>You can either make either make this on your virtual machine, or cloud. For cloud choose any platform(<code>DigitalOcean, Vultr</code>, etc) and make an account. You will usually get free credits for some months or so. Use them to complete this project.</p>
+<p>For now , I will use a cloud platform called DigitalOcean.
+Use this link to get a free $200 credit , should be more than enough for this project.</p>
+<p><code>https://www.digitalocean.com/?refcode=e2ce5a05f701&amp;utm_campaign=Referral_Invite&amp;utm_medium=Referral_Program&amp;utm_source=CopyPaste</code></p>
+<p>To activate this credit, you must link a valid credit card.</p>
+<p><em><strong>Note</strong></em>: <code>If you opted for the cloud option, don't forget set the hostname name as legit as possible. Eg: WBC-Web-Server2</code>.</p>
+<hr>
+<h1 id="creating-our-cloud-vm">Creating our Cloud VM</h1>
+<p>After creating an account, navigate to &ldquo;Create &mdash;&gt; Droplets&rdquo;. Now select these things:</p>
+<ul>
+<li>A datacenter close to your home</li>
+<li>Ubuntu version <code>24.04 (LTS) x64</code></li>
+<li>Regular Disk type SSD</li>
+<li>$48/mo (8 gb/4 CPU) plan  &mdash;- <code>might change in the future</code></li>
+<li>Use Password authentication method</li>
+<li>Hostname must sound legit <code>WBC-Web-Server2</code></li>
+</ul>
+<p><img src="/images/honeypot-project/1.png"></p>
+<p>Click on your droplet and you will find additional information regarding that VM.</p>
+<p><img src="/images/honeypot-project/2.png"></p>
+<p>It is important to configure a firewall so that only you and your associated IPs can connect to this machine but since this a <strong>Honeypot</strong>, you want it to be able to be accessible from anywhere.</p>
+<hr>
+<h1 id="accessing-the-vm-and-creating-user">Accessing the VM and Creating User</h1>
+<p>To access the VM, you can already see the public IPv4 address in the above screenshot. Copy it and open powershell and login via SSH:</p>
+<p><img src="/images/honeypot-project/3.png"></p>
+<p>Update the drivers to avoid future errors. Press &ldquo;enter&rdquo; if prompt to do so.</p>
+<p><img src="/images/honeypot-project/4.png"></p>
+<p>Once this is done, you must also create a new user. Only one user exist at the moment which is the <code>Root</code>user and it is not best practice to run commands or use the vm with root account.</p>
+<h5 id="user-creation">User creation:</h5>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>adduser bill   <span style="color:#f92672">(</span>you can use whatever name you want<span style="color:#f92672">)</span>
+</span></span></code></pre></div><p>Leave other details of bill as empty.</p>
+<p>Also add <code>bill</code>to the sudo group.
+<code>A sudo group is **a group of superusers that have privileged access to root commands**</code></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-Shell" data-lang="Shell"><span style="display:flex;"><span>sudo usermod -aG sudo bill
+</span></span></code></pre></div><p><code>bill</code> will now have admin privileges.</p>
+<p>Finally, switch user to <code>bill</code> by using this command:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>su bill
+</span></span></code></pre></div><p><img src="/images/honeypot-project/5.png"></p>
+<hr>
+<h1 id="installing-t-pot-honeypot">Installing T-Pot HoneyPot</h1>
+<p>Clone this github repo :</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>git clone https://github.com/telekom-security/tpotce
+</span></span></code></pre></div><p>Change directories to <code>tpotce</code> and run the install script and follow the onscreen instructions:</p>
+<p><img src="/images/honeypot-project/6.png"></p>
+<p>Keep in mind that this installation will change your ssh port to <em>64295</em>, shown in the output. That means to log back in with ssh , you mush specify this port</p>
+<p><code>ssh bill@&lt;ipaddr&gt; -p 64295</code></p>
+<p><img src="/images/honeypot-project/7.png"></p>
+<p>After some time this will pop up, select the first option:</p>
+<p><img src="/images/honeypot-project/8.png"></p>
+<p>Type <code>bill</code> as the web-user or whatever name you chose.</p>
+<p>This process might take some time , and might also fail if you chose a VM with low ram during the installation. If that happens, select <code>M</code> for mini T-pot installation.</p>
+<p><img src="/images/honeypot-project/9.png">
+<code>sudo reboot</code></p>
+<p>Wait a few mins before reconnecting.</p>
+<p><code>ssh root@139.59.70.190 -p 64295</code></p>
+<p>After re-logging in , you can view the status of the <code>tpot</code> service running by running this command :</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>systemctl status tpot
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>systemctl restart tpot  <span style="color:#f92672">(</span> <span style="color:#66d9ef">if</span> you have trouble viewing the webUI <span style="color:#f92672">)</span>
+</span></span></code></pre></div><hr>
+<h1 id="t-pot-honeypot-webui">T-Pot Honeypot WebUI</h1>
+<p>After everything is complete , you can view the webUI with this port :</p>
+<p><code>https://&lt;your.ip&gt;:64297</code></p>
+<p>It will throw us on a landing page where you can view the attack map. There are other options as well.</p>
+<p><img src="/images/honeypot-project/10.png"></p>
+<p>Select the <code>&quot;kibana&quot;</code> option from the landing page and you will be presented with a dashboard in Elastic SIEM. You can filter it by IPs , ports , services attacked, passwords used to brute force, users attacked, etc. Play</p>
+<p><img src="/images/honeypot-project/11.png"></p>
+<p>There are hundreds of attacks and scans already happening and If you check back the map after a hour or so , you will see a lot more action.</p>
+<p>I encourage you to play around with it and have fun, its pretty cool.</p>
+<hr>
+<h1 id="closing-summary"><strong>Closing summary</strong>:</h1>
+<h3 id="skills-learned--concepts-reinforced">Skills learned &amp; concepts reinforced</h3>
+<ul>
+<li>
+<p><strong>Infrastructure provisioning &amp; hardening</strong></p>
+<ul>
+<li>Creating and configuring a cloud VM, non-root user creation, minimal privilege management, and snapshot-based recovery workflows.</li>
+</ul>
+</li>
+<li>
+<p><strong>Service deployment &amp; package orchestration</strong></p>
+<ul>
+<li>Using <code>git</code> and the T-Pot installer, understanding Docker/compose orchestration, recognizing common install failures and resource constraints, and managing services with <code>systemctl</code>.</li>
+</ul>
+</li>
+<li>
+<p><strong>Honeypot concepts and telemetry collection</strong></p>
+<ul>
+<li>Why honeypots are used (intelligence, early detection, signature generation), and how multiple sensors (Telnet/SSH/HTTP/Elastic/Suricata/ConPot/etc.) are combined to create high-fidelity telemetry.</li>
+</ul>
+</li>
+<li>
+<p><strong>Log analysis and triage</strong></p>
+<ul>
+<li>Accessing Kibana dashboards, filtering by IP/port/service/time, extracting IOCs (IPs, usernames, passwords, URI paths), and correlating events across network (pcap) and host logs.</li>
+</ul>
+</li>
+<li>
+<p><strong>Detection &amp; operationalization</strong></p>
+<ul>
+<li>Producing actionable outputs: IOCs for firewall/IDS, Suricata/Zeek/IDS rules, and initial remediation advice (block lists, network segmentation, rate limiting).</li>
+</ul>
+</li>
+<li>
+<p><strong>Practical operational skills</strong></p>
+<ul>
+<li>Safe handling of live malicious traffic (isolation, snapshot recovery), resource planning for logging, and documenting evidence for reproducible analysis.</li>
+</ul>
+</li>
+</ul>
 ]]></content>
         </item>
         

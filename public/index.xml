@@ -79,6 +79,13 @@
       <description>Logical Diagram / Setup Structure CompanyX-ADDC01 ip 139.x.x.x public&#xD;CompanyX-ADDC01 ip 10.51.96.4 private&#xD;Test instance ip 139.x.x.x public&#xD;Test instance&#x9;ip 10.51.96.3 private&#xD;CompanyX-Splunk ip 139.x.x.x public&#xD;CompanyX-Splunk ip 10.51.96.5 private Using Vultr cloud resources , I set up 3 different machines:&#xA;1 splunk ubuntu machine that will be the splunk server&#xD;1 Active directory machine 1 test windows machine&#xD;I have set up a VPC network so that all 3 machines could interact nicely.</description>
     </item>
     <item>
+      <title>T-Pot Honeypot Setup and Attack Monitoring</title>
+      <link>http://localhost:1313/posts/honeypot-project/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      <guid>http://localhost:1313/posts/honeypot-project/</guid>
+      <description>What is a honeypot? A Honeypot is a decoy system or network resource designed to attract, detect, and study cyberattacks by mimicking a legitimate and valuable target.It serves as a trap for attackers, luring them into a controlled environment where security professionals can observe and gather intel.&#xA;Project objective Deploy a production-style T-Pot honeypot instance, validate it’s collecting telemetry, and demonstrate basic analyst workflows: access the Kibana web UI, filter events (by IP/port/service), extract IOCs (IPs, usernames, passwords), and capture a short write-up showing one example incident (timeline + pcap or Sysmon/Suricata evidence).</description>
+    </item>
+    <item>
       <title>Whoami</title>
       <link>http://localhost:1313/whoami/</link>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
